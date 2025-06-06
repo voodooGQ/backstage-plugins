@@ -1,0 +1,1 @@
+export { ComponentProcessor } from './ComponentProcessor';
