@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ruby-app
+  description: An example of a ruby application.
+  annotations:
+    package-deps/ruby: "./Gemfile.lock"
+spec:
+  type: app
+  owner: guests
+  lifecycle: experimental
+
