@@ -52,7 +52,4 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 // kubernetes
 backend.add(import('@backstage/plugin-kubernetes-backend'));
 
-// Dependency Package Provider
-backend.add(import('@voodoogq/plugin-catalog-backend-module-dependency-package-entity-provider'));
-
 backend.start();
