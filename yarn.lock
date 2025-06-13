@@ -13115,6 +13115,8 @@ __metadata:
     "@backstage/plugin-catalog-node": "npm:^1.17.0"
     "@types/express": "npm:^4.17.6"
     "@types/supertest": "npm:^2.0.12"
+    "@voodoogq/plugin-dependency-packages-common": "npm:^0.1.0"
+    "@voodoogq/plugin-dependency-packages-node": "npm:^0.1.0"
     express: "npm:^4.17.1"
     express-promise-router: "npm:^4.1.0"
     supertest: "npm:^6.2.4"
@@ -13130,7 +13132,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@voodoogq/plugin-dependency-packages-node@workspace:plugins/dependency-packages-node":
+"@voodoogq/plugin-dependency-packages-node@npm:^0.1.0, @voodoogq/plugin-dependency-packages-node@workspace:plugins/dependency-packages-node":
   version: 0.0.0-use.local
   resolution: "@voodoogq/plugin-dependency-packages-node@workspace:plugins/dependency-packages-node"
   dependencies:
