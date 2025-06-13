@@ -1,6 +1,6 @@
 
 import {
-  DependencyType,
+  DependencyTypeRetriever,
   DependencyTypeRegistration,
   DependencyTypeRegistry,
 } from '@voodoogq/plugin-dependency-packages-node';
@@ -19,7 +19,7 @@ export class DefaultDependencyTypeRegistry implements DependencyTypeRegistry {
   registerSync(registration: DependencyTypeRegistration) {
     if (this.retrievers.has(registration.dependencyTypeRetriever.id)) {
       throw new ConflictError(
-        `Tech insight fact retriever with identifier '${registration.dependencyTypeRetriever.id}' has already been registered`,
+        `Dependency type retriever with identifier '${registration.dependencyTypeRetriever.id}' has already been registered`,
       );
     }
     this.retrievers.set(registration.dependencyTypeRetriever.id, registration);
@@ -33,13 +33,13 @@ export class DefaultDependencyTypeRegistry implements DependencyTypeRegistry {
     const registration = this.retrievers.get(retrieverReference);
     if (!registration) {
       throw new NotFoundError(
-        `Tech insight fact retriever with identifier '${retrieverReference}' is not registered.`,
+        `Dependency type retriever with identifier '${retrieverReference}' is not registered.`,
       );
     }
     return registration;
   }
 
-  async listRetrievers(): Promise<DependencyType[]> {
+  async listRetrievers(): Promise<DependencyTypeRetriever[]> {
     return [...this.retrievers.values()].map(it => it.dependencyTypeRetriever);
   }
 

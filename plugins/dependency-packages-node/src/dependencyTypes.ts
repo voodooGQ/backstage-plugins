@@ -9,18 +9,22 @@ import { HumanDuration } from '@backstage/types';
 import { DependencyTypeSchema } from '@voodoogq/plugin-dependency-packages-common';
 import { Duration } from 'luxon';
 
+export type DependencyType= {
+  id: string;
+  version: string;
+  title?: string;
+  description?: string;
+};
+
 export type DependencyTypeContext<TExtension = {}> = {
   config: Config;
   discovery: DiscoveryService;
   logger: LoggerService;
   auth: AuthService;
   urlReader: UrlReaderService;
-  entityFilter?:
-    | Record<string, string | symbol | (string | symbol)[]>[]
-    | Record<string, string | symbol | (string | symbol)[]>;
 } & TExtension;
 
-export interface DependencyType<
+export interface DependencyTypeRetriever<
   TContext extends DependencyTypeContext = DependencyTypeContext,
 > {
   id: string;
@@ -29,15 +33,12 @@ export interface DependencyType<
   description?: string;
   handler: (ctx: TContext) => Promise<DependencyType[]>;
   schema: DependencyTypeSchema;
-  entityFilter?:
-    | Record<string, string | symbol | (string | symbol)[]>[]
-    | Record<string, string | symbol | (string | symbol)[]>;
 }
 
 export type DependencyTypeRegistration<
   TContext extends DependencyTypeContext = DependencyTypeContext,
 > = {
-  dependencyTypeRetriever: DependencyType<TContext>;
+  dependencyTypeRetriever: DependencyTypeRetriever<TContext>;
   cadence?: string;
   timeout?: Duration | HumanDuration;
   initialDelay?: Duration | HumanDuration;
