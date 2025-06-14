@@ -5,6 +5,7 @@ import {
 import { createRouter } from '../router';
 import {
   dependencyPackagesDependencyTypeRegistryExtensionPoint,
+  dependencyPackagesDependencyTypeExtensionPoint,
   DependencyType,
   DependencyTypeRegistry,
   DependencyTypeRegistration
@@ -16,7 +17,6 @@ export const dependencyPackagesPlugin = createBackendPlugin({
   pluginId: 'dependency-packages',
   register(env) {
     let dependencyTypeRegistry: DependencyTypeRegistry | undefined = undefined;
-
     env.registerExtensionPoint(
       dependencyPackagesDependencyTypeRegistryExtensionPoint,
       {
@@ -27,6 +27,13 @@ export const dependencyPackagesPlugin = createBackendPlugin({
     );
 
     const addedDependencyTypes: Record<string, DependencyType> = {};
+    env.registerExtensionPoint(dependencyPackagesDependencyTypeExtensionPoint, {
+      addDependencyType(dependencyTypes: Record<string, DependencyType>): void {
+        Object.entries(dependencyTypes).forEach(([name, dependencyType]) => {
+          addedDependencyTypes[name] = dependencyType;
+        });
+      },
+    });
 
     env.registerInit({
       deps: {
@@ -39,20 +46,26 @@ export const dependencyPackagesPlugin = createBackendPlugin({
       },
       async init({ httpRouter, permissionsRegistry, config, logger, permissions, httpAuth }) {
         logger.info("DEPENDENCY-PACKAGES: Initialized")
+        logger.info(JSON.stringify(addedDependencyTypes))
 
         permissionsRegistry.addPermissions(dependencyPackagesPermissions);
 
         const dependencyTypes: DependencyTypeRegistration[] = Object.entries(
           addedDependencyTypes,
         )
-          .map(([name, dependencyType]) =>
-            createDependencyTypeRegistrationFromConfig(
+          .map(([name, dependencyType]) => {
+            console.log(name, dependencyType)
+            const registration = createDependencyTypeRegistrationFromConfig(
               config,
               name,
               dependencyType,
-            ),
-          )
+            )
+            console.log(registration)
+            return registration
+          })
           .filter(registration => registration) as DependencyTypeRegistration[];
+
+        console.log(dependencyTypes)
 
         const context = { config };
 

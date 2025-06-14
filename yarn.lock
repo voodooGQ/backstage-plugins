@@ -13102,13 +13102,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@voodoogq/plugin-dependency-packages-backend-module-npm-provider@workspace:plugins/dependency-packages-backend-module-npm-provider":
+"@voodoogq/plugin-dependency-packages-backend-module-npm-provider@npm:^0.1.0, @voodoogq/plugin-dependency-packages-backend-module-npm-provider@workspace:plugins/dependency-packages-backend-module-npm-provider":
   version: 0.0.0-use.local
   resolution: "@voodoogq/plugin-dependency-packages-backend-module-npm-provider@workspace:plugins/dependency-packages-backend-module-npm-provider"
   dependencies:
     "@backstage/backend-plugin-api": "npm:^1.3.1"
     "@backstage/backend-test-utils": "npm:^1.5.0"
     "@backstage/cli": "npm:^0.32.1"
+    "@voodoogq/plugin-dependency-packages-common": "npm:^0.1.0"
+    "@voodoogq/plugin-dependency-packages-node": "npm:^0.1.0"
   languageName: unknown
   linkType: soft
 
@@ -14461,6 +14463,7 @@ __metadata:
     "@backstage/plugin-search-backend-node": "npm:^1.3.11"
     "@backstage/plugin-techdocs-backend": "npm:^2.0.2"
     "@voodoogq/plugin-dependency-packages-backend": "npm:^0.1.0"
+    "@voodoogq/plugin-dependency-packages-backend-module-npm-provider": "npm:^0.1.0"
     app: "link:../app"
     better-sqlite3: "npm:^9.0.0"
     node-gyp: "npm:^10.0.0"
