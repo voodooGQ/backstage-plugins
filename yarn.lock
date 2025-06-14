@@ -13121,14 +13121,17 @@ __metadata:
     "@backstage/backend-test-utils": "npm:^1.5.0"
     "@backstage/catalog-client": "npm:^1.9.1"
     "@backstage/cli": "npm:^0.32.1"
+    "@backstage/config": "npm:^1.3.2"
     "@backstage/errors": "npm:^1.2.7"
     "@backstage/plugin-catalog-node": "npm:^1.17.0"
+    "@backstage/types": "npm:^1.2.1"
     "@types/express": "npm:^4.17.6"
     "@types/supertest": "npm:^2.0.12"
     "@voodoogq/plugin-dependency-packages-common": "npm:^0.1.0"
     "@voodoogq/plugin-dependency-packages-node": "npm:^0.1.0"
     express: "npm:^4.17.1"
     express-promise-router: "npm:^4.1.0"
+    luxon: "npm:^3.6.1"
     supertest: "npm:^6.2.4"
     zod: "npm:^3.22.4"
   languageName: unknown
@@ -13139,6 +13142,7 @@ __metadata:
   resolution: "@voodoogq/plugin-dependency-packages-common@workspace:plugins/dependency-packages-common"
   dependencies:
     "@backstage/cli": "npm:^0.32.1"
+    "@backstage/plugin-permission-common": "npm:^0.8.4"
   languageName: unknown
   linkType: soft
 
