@@ -1,6 +1,6 @@
 
 import {
-  DependencyTypeRetriever,
+  DependencyType,
   DependencyTypeRegistration,
   DependencyTypeRegistry,
 } from '@voodoogq/plugin-dependency-packages-node';
@@ -10,37 +10,37 @@ import { ConflictError, NotFoundError } from '@backstage/errors';
 export class DefaultDependencyTypeRegistry implements DependencyTypeRegistry {
   private readonly retrievers = new Map<string, DependencyTypeRegistration>();
 
-  constructor(retrievers: DependencyTypeRegistration[]) {
-    retrievers.forEach(r => {
+  constructor(dependencyTypes: DependencyTypeRegistration[]) {
+    dependencyTypes.forEach(r => {
       this.registerSync(r);
     });
   }
 
   registerSync(registration: DependencyTypeRegistration) {
-    if (this.retrievers.has(registration.dependencyTypeRetriever.id)) {
+    if (this.retrievers.has(registration.dependencyType.id)) {
       throw new ConflictError(
-        `Dependency type retriever with identifier '${registration.dependencyTypeRetriever.id}' has already been registered`,
+        `Dependency type with identifier '${registration.dependencyType.id}' has already been registered`,
       );
     }
-    this.retrievers.set(registration.dependencyTypeRetriever.id, registration);
+    this.retrievers.set(registration.dependencyType.id, registration);
   }
 
   async register(registration: DependencyTypeRegistration) {
     this.registerSync(registration);
   }
 
-  async get(retrieverReference: string): Promise<DependencyTypeRegistration> {
-    const registration = this.retrievers.get(retrieverReference);
+  async get(reference: string): Promise<DependencyTypeRegistration> {
+    const registration = this.retrievers.get(reference);
     if (!registration) {
       throw new NotFoundError(
-        `Dependency type retriever with identifier '${retrieverReference}' is not registered.`,
+        `Dependency type retriever with identifier '${reference}' is not registered.`,
       );
     }
     return registration;
   }
 
-  async listRetrievers(): Promise<DependencyTypeRetriever[]> {
-    return [...this.retrievers.values()].map(it => it.dependencyTypeRetriever);
+  async listDependencyTypes(): Promise<DependencyType[]> {
+    return [...this.retrievers.values()].map(r => r.dependencyType);
   }
 
   async listRegistrations(): Promise<DependencyTypeRegistration[]> {
@@ -48,7 +48,7 @@ export class DefaultDependencyTypeRegistry implements DependencyTypeRegistry {
   }
 
   async getSchemas(): Promise<DependencyTypeSchema[]> {
-    const retrievers = await this.listRetrievers();
-    return retrievers.map(it => it.schema);
+    const retrievers = await this.listDependencyTypes();
+    return retrievers.map(r => r.schema || {});
   }
 }

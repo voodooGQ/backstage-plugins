@@ -2,8 +2,17 @@ import { InputError } from '@backstage/errors';
 import { z } from 'zod';
 import express from 'express';
 import Router from 'express-promise-router';
+import { DependencyTypeRegistration } from '@voodoogq/plugin-dependency-packages-node';
+import { HttpAuthService, LoggerService, PermissionsService } from '@backstage/backend-plugin-api';
 
-export async function createRouter(): Promise<express.Router> {
+export interface RouterOptions {
+  dependencyTypes: DependencyTypeRegistration[];
+  logger: LoggerService;
+  permissions: PermissionsService;
+  httpAuth: HttpAuthService;
+}
+
+export async function createRouter({ dependencyTypes }: RouterOptions): Promise<express.Router> {
   const router = Router();
   router.use(express.json());
 
@@ -18,7 +27,7 @@ export async function createRouter(): Promise<express.Router> {
       throw new InputError(parsed.error.toString());
     }
 
-    res.status(201).json({ message: 'success' });
+    res.status(201).json({ message: 'success', data: dependencyTypes });
   });
 
   return router;

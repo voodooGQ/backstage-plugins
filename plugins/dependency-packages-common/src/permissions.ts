@@ -14,15 +14,7 @@ export const dependencyPackagesUpdatePermission = createPermission({
   },
 });
 
-export const dependencyPackagesDependencyTypeRetrieverReadPermission = createPermission({
-  name: 'dependency-packages.dependency-type-retriever.read',
-  attributes: {
-    action: 'read',
-  },
-});
-
 export const dependencyPackagesPermissions = [
   dependencyPackagesReadPermission,
   dependencyPackagesUpdatePermission,
-  dependencyPackagesDependencyTypeRetrieverReadPermission,
 ];

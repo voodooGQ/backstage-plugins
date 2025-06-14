@@ -1,25 +1,28 @@
 import { HumanDuration } from '@backstage/types';
 import {
-  DependencyTypeRetriever,
+  DependencyType,
   DependencyTypeRegistration,
 } from '@voodoogq/plugin-dependency-packages-node';
 import { Duration } from 'luxon';
+import { DependencyTypeSchema } from '@voodoogq/plugin-dependency-packages-common';
 
 export type DependencyTypeRetrieverRegistrationOptions = {
   cadence: string;
-  dependencyTypeRetriever: DependencyTypeRetriever;
+  dependencyType: DependencyType;
   timeout?: Duration | HumanDuration;
   initialDelay?: Duration | HumanDuration;
+  schema?: DependencyTypeSchema;
 };
 
 export function createDependencyTypeRetrieverRegistration(
   options: DependencyTypeRetrieverRegistrationOptions,
 ): DependencyTypeRegistration {
-  const { cadence, dependencyTypeRetriever, timeout, initialDelay } = options;
+  const { cadence, dependencyType, timeout, initialDelay, schema } = options;
   return {
     cadence,
-    dependencyTypeRetriever,
+    dependencyType,
     timeout,
     initialDelay,
+    schema,
   };
 }

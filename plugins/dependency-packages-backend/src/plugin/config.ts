@@ -1,6 +1,6 @@
 import { Config, readDurationFromConfig } from '@backstage/config';
 import {
-  DependencyTypeRetriever,
+  DependencyType,
   DependencyTypeRegistration,
 } from '@voodoogq/plugin-dependency-packages-node';
 import {
@@ -10,7 +10,7 @@ import {
 
 type DependencyTypeConfig = Omit<
   DependencyTypeRetrieverRegistrationOptions,
-  'dependencyTypeRetriever'
+  'dependencyType'
 >;
 
 function readDependencyTypeConfig(
@@ -42,14 +42,14 @@ function readDependencyTypeConfig(
 export function createDependencyTypeRegistrationFromConfig(
   config: Config,
   name: string,
-  dependencyTypeRetriever: DependencyTypeRetriever,
+  dependencyType: DependencyType,
 ): DependencyTypeRegistration | undefined {
   const dependencyTypeConfig = readDependencyTypeConfig(config, name);
 
   return dependencyTypeConfig
     ? createDependencyTypeRetrieverRegistration({
         ...dependencyTypeConfig,
-        dependencyTypeRetriever,
+        dependencyType,
       })
     : undefined;
 }
