@@ -38,6 +38,8 @@ export const dependencyPackagesPlugin = createBackendPlugin({
         permissionsRegistry: coreServices.permissionsRegistry,
       },
       async init({ httpRouter, permissionsRegistry, config, logger, permissions, httpAuth }) {
+        logger.info("DEPENDENCY-PACKAGES: Initialized")
+
         permissionsRegistry.addPermissions(dependencyPackagesPermissions);
 
         const dependencyTypes: DependencyTypeRegistration[] = Object.entries(

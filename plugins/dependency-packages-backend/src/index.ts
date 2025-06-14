@@ -1,1 +1,1 @@
-export { dependencyPackagesPlugin as default } from './plugin/plugin';
+export { dependencyPackagesPlugin as default } from './plugin';
