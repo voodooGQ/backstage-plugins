@@ -8,6 +8,7 @@ import {
   AuthService,
   LoggerService,
 } from '@backstage/backend-plugin-api';
+import fs from 'fs';
 
 
 export class DependencyPackagesProvider {
@@ -57,12 +58,53 @@ export class DependencyPackagesProvider {
     const credentials = await this.auth.getOwnServiceCredentials();
 
     const entities = await this.catalog.getEntities({
-      filter: {
-        kind: 'Component',
-      },
+      filter: [
+        {
+          kind: 'Component',
+        },
+      ],
     }, { credentials });
 
-    this.logger.info(`${JSON.stringify(entities)}`)
+    const filteredEntities = entities.items.filter(entity => {
+      return entity.metadata.annotations?.['package-deps/npm'];
+    });
+
+    const values = filteredEntities.map(entity => {
+      return {
+        location: entity.metadata.annotations?.['backstage.io/managed-by-location'],
+        annotation: entity.metadata.annotations?.['package-deps/npm'],
+      }
+    });
+
+    const transformedValues = values.map(
+      (value: { location: string | undefined; annotation: string | undefined }): string | undefined => {
+        if (!value.location || !value.annotation) {
+          return undefined;
+        }
+        const loc =  value.location.split('/')
+        loc.pop();
+
+        const newLoc = `${loc.join('/')}/${value.annotation.split('/').pop()}`;
+
+        return newLoc;
+      }
+    );
+
+    transformedValues.forEach(async (value) => {
+      if (!value) {
+        return;
+      }
+      if(value.startsWith('file:')) {
+        fs.readFile(value.replace('file:', ''), 'utf8', (err, data) => {
+          if (err) {
+            console.error('Error reading file:', err);
+            return;
+          }
+          console.log(data);
+        });
+      }
+    })
+
 
     // const response = await this.reader.readUrl(
     //   `https://frobs-${this.env}.example.com/data`,

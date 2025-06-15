@@ -21,9 +21,8 @@ export const catalogModuleDependencyPackages = createBackendModule({
       },
       async init({ builder, catalog, logger, auth, reader, scheduler }) {
         const taskRunner = scheduler.createScheduledTaskRunner({
-          frequency: { minutes: 1 },
+          frequency: { seconds: 10 },
           timeout: { minutes: 1 },
-          initialDelay: { minutes: 1 },
         });
         const provider = new DependencyPackagesProvider(
           'local',
