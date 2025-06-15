@@ -100,7 +100,13 @@ export class DependencyPackagesProvider {
             console.error('Error reading file:', err);
             return;
           }
-          console.log(data);
+          const parsed = JSON.parse(data);
+          Object.entries(parsed.dependencies).forEach(([dep, ver]: [string, unknown]) => {
+            this.logger.info(`DEP: ${dep} | VER: ${ver}`);
+          });
+          Object.entries(parsed.devDependencies).forEach(([dep, ver]: [string, unknown]) => {
+            this.logger.info(`DEV DEP: ${dep} | VER: ${ver}`);
+          });
         });
       }
     })
