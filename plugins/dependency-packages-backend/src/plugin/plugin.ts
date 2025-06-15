@@ -46,7 +46,6 @@ export const dependencyPackagesPlugin = createBackendPlugin({
       },
       async init({ httpRouter, permissionsRegistry, config, logger, permissions, httpAuth }) {
         logger.info("DEPENDENCY-PACKAGES: Initialized")
-        logger.info(JSON.stringify(addedDependencyTypes))
 
         permissionsRegistry.addPermissions(dependencyPackagesPermissions);
 
@@ -54,18 +53,14 @@ export const dependencyPackagesPlugin = createBackendPlugin({
           addedDependencyTypes,
         )
           .map(([name, dependencyType]) => {
-            console.log(name, dependencyType)
             const registration = createDependencyTypeRegistrationFromConfig(
               config,
               name,
               dependencyType,
             )
-            console.log(registration)
             return registration
           })
           .filter(registration => registration) as DependencyTypeRegistration[];
-
-        console.log(dependencyTypes)
 
         const context = { config };
 
