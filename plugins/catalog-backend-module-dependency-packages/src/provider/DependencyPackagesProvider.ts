@@ -10,6 +10,16 @@ import {
 } from '@backstage/backend-plugin-api';
 import fs from 'fs';
 
+export interface DependencyPackageProviderOptions {
+  env: string;
+  catalog: CatalogService;
+  reader: UrlReaderService;
+  auth: AuthService;
+  logger: LoggerService;
+  taskRunner: SchedulerServiceTaskRunner;
+  backendUrl: string;
+}
+
 
 export class DependencyPackagesProvider {
   private readonly env: string;
@@ -17,23 +27,18 @@ export class DependencyPackagesProvider {
   private readonly reader: UrlReaderService;
   private readonly logger: LoggerService;
   private readonly auth: AuthService;
+  private readonly backendUrl: string;
   private connection?: EntityProviderConnection;
   private taskRunner: SchedulerServiceTaskRunner;
 
-  constructor(
-    env: string,
-    catalog: CatalogService,
-    reader: UrlReaderService,
-    auth: AuthService,
-    logger: LoggerService,
-    taskRunner: SchedulerServiceTaskRunner,
-  ) {
-    this.env = env;
-    this.catalog = catalog;
-    this.reader = reader;
-    this.logger = logger;
-    this.auth = auth;
-    this.taskRunner = taskRunner;
+  constructor(options: DependencyPackageProviderOptions) {
+    this.env = options.env;
+    this.catalog = options.catalog;
+    this.reader = options.reader;
+    this.logger = options.logger;
+    this.auth = options.auth;
+    this.taskRunner = options.taskRunner;
+    this.backendUrl = options.backendUrl;
   }
 
   getProviderName(): string {
@@ -56,6 +61,22 @@ export class DependencyPackagesProvider {
     }
 
     const credentials = await this.auth.getOwnServiceCredentials();
+    const { token } = await this.auth.getPluginRequestToken({
+      targetPluginId: 'dependency-packages',
+      onBehalfOf: credentials,
+    })
+
+    const response = await fetch(
+      `${this.backendUrl}/dependency-types`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    const responseData = await response.json();
+    this.logger.info(JSON.stringify(responseData));
+
 
     const entities = await this.catalog.getEntities({
       filter: [

@@ -16,16 +16,16 @@ export async function createRouter({ dependencyTypes }: RouterOptions): Promise<
   const router = Router();
   router.use(express.json());
 
-  const dependencyTypeSchema = z.object({
-    title: z.string(),
-    entityRef: z.string().optional(),
-  });
+  // const dependencyTypeSchema = z.object({
+  //   title: z.string(),
+  //   entityRef: z.string().optional(),
+  // });
 
-  router.post('/dependency-types', async (req, res) => {
-    const parsed = dependencyTypeSchema.safeParse(req.body);
-    if (!parsed.success) {
-      throw new InputError(parsed.error.toString());
-    }
+  router.get('/dependency-types', async (_req, res) => {
+    // const parsed = dependencyTypeSchema.safeParse(req.body);
+    // if (!parsed.success) {
+    //   throw new InputError(parsed.error.toString());
+    // }
 
     res.status(201).json({ message: 'success', data: dependencyTypes });
   });
