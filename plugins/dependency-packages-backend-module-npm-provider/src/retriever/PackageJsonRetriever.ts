@@ -41,27 +41,30 @@ export class PackageJsonRetriever implements DependencyTypeRetriever {
     return newLoc;
   }
 
-  // TODO: Get DependencyPackageProvider configured to read this
-  async retrieve(entity: ComponentEntity): Promise<any> {
-    const packageLocation = this.getPackageLocation(
-      this.transformEntityData(entity)
-    );
+  async retrieve(entities: ComponentEntity[]): Promise<any> {
+    return entities.map((entity: ComponentEntity) => {
+      const packageLocation = this.getPackageLocation(
+        this.transformEntityData(entity)
+      );
 
-    if (!packageLocation) {
-      throw new Error('Missing location');
-    }
+      if (!packageLocation) {
+        throw new Error('Missing location');
+      }
 
-    if(packageLocation.startsWith('file:')) {
-      fs.readFile(packageLocation.replace('file:', ''), 'utf8', (err, data): { dependencies: [string, string][]; devDependencies: [string, string][] } => {
-        if (err) {
-          throw new Error(`Error Reading File: ${err}`);
-        }
+      let response: { dependencies: [string, string][]; devDependencies: [string, string][] } = { dependencies: [], devDependencies: [] };
+
+      if(packageLocation.startsWith('file:')) {
+        const data = fs.readFileSync(packageLocation.replace('file:', ''), 'utf8');
         const parsed = JSON.parse(data);
-        return {
-          dependencies: Object.entries(parsed.dependencies).map(([dep, ver]: [string, unknown]) => [dep, ver as string]),
-          devDependencies: Object.entries(parsed.devDependencies).map(([dep, ver]: [string, unknown]) => [dep, ver as string]),
+        const dependencies: [string, string][] = Object.entries(parsed.dependencies)
+        const devDependencies: [string, string][] = Object.entries(parsed.devDependencies)
+        response = {
+          dependencies,
+          devDependencies,
         }
-      });
-    }
+      }
+
+      return response;
+    });
   }
 }

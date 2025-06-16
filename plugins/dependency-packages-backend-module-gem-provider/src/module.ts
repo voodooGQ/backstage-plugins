@@ -16,13 +16,13 @@ export const dependencyPackagesModuleGemProvider = createBackendModule({
       },
       async init({ logger, registry }) {
         logger.info('DEPENDENCY-PACKAGES: GEM Provider initialized');
-        registry.addDependencyType({
-          'ruby': {
-            id: 'ruby',
-            version: '1.0.0',
-            router: await router({ logger }),
-          }
-        });
+        // registry.addDependencyType({
+        //   'ruby': {
+        //     id: 'ruby',
+        //     version: '1.0.0',
+        //     router: await router({ logger }),
+        //   }
+        // });
       },
     });
   },

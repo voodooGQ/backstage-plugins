@@ -8,5 +8,5 @@ export type DependencyTypeSchema = {
 };
 
 export interface DependencyTypeRetriever {
-  retrieve(entity: ComponentEntity): Promise<any>;
+  retrieve(entities: ComponentEntity[]): Promise<any>;
 }
