@@ -27,7 +27,13 @@ export async function createRouter({ dependencyTypes }: RouterOptions): Promise<
     //   throw new InputError(parsed.error.toString());
     // }
 
-    res.status(201).json({ message: 'success', data: dependencyTypes });
+    const data = dependencyTypes.map(type => type.dependencyType.id);
+    res.status(201).json({ message: 'success', data });
+  });
+
+  dependencyTypes.forEach(type => {
+    console.log(type.dependencyType);
+    router.use(`/${type.dependencyType.id}`, type.dependencyType.router);
   });
 
   return router;

@@ -3,6 +3,7 @@ import {
   createBackendModule,
 } from '@backstage/backend-plugin-api';
 import { dependencyPackagesDependencyTypeExtensionPoint } from '@voodoogq/plugin-dependency-packages-node';
+import { createRouter as router } from "./router";
 
 export const dependencyPackagesModuleGemProvider = createBackendModule({
   pluginId: 'dependency-packages',
@@ -19,6 +20,7 @@ export const dependencyPackagesModuleGemProvider = createBackendModule({
           'ruby': {
             id: 'ruby',
             version: '1.0.0',
+            router: await router({ logger }),
           }
         });
       },

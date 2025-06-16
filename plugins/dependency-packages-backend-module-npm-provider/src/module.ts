@@ -3,7 +3,7 @@ import {
   createBackendModule,
 } from '@backstage/backend-plugin-api';
 import { dependencyPackagesDependencyTypeExtensionPoint } from '@voodoogq/plugin-dependency-packages-node';
-import { PackageJsonRetriever } from './retriever/PackageJsonRetriever';
+import { createRouter as router } from './router';
 
 export const dependencyPackagesModuleNpmProvider = createBackendModule({
   pluginId: 'dependency-packages',
@@ -20,7 +20,7 @@ export const dependencyPackagesModuleNpmProvider = createBackendModule({
           'npm': {
             id: 'npm',
             version: '1.0.0',
-            retriever: new PackageJsonRetriever({ logger })
+            router: await router({ logger }),
           }
         });
       },

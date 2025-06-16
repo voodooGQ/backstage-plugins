@@ -31,6 +31,7 @@
     "@backstage/plugin-permission-common": "^0.8.4",
     "@backstage/types": "^1.2.1",
     "@voodoogq/plugin-dependency-packages-common": "^0.1.0",
+    "express": "^5.1.0",
     "luxon": "^3.6.1"
   },
   "files": [

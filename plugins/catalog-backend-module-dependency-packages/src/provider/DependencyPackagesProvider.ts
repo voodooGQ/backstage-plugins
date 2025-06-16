@@ -77,6 +77,17 @@ export class DependencyPackagesProvider {
     const responseData = await response.json();
     this.logger.info(JSON.stringify(responseData));
 
+    const testResponse = await fetch(
+      `${this.backendUrl}/npm/retrieve`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    const testResponseData = await testResponse.json();
+    this.logger.info(JSON.stringify(testResponseData));
+
 
     const entities = await this.catalog.getEntities({
       filter: [
