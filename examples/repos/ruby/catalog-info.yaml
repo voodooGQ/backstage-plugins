@@ -4,7 +4,7 @@ metadata:
   name: ruby-app
   description: An example of a ruby application.
   annotations:
-    package-deps/ruby: "./Gemfile.lock"
+    package-deps/ruby: "file:/Users/sas/Code/github.com/voodooGQ/backstage-plugins/examples/repos/ruby/Gemfile.lock"
 spec:
   type: app
   owner: guests
