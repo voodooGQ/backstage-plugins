@@ -2,7 +2,7 @@ import { LoggerService } from '@backstage/backend-plugin-api';
 import { ComponentEntity } from '@backstage/catalog-model';
 import { DependencyTypeRetriever } from '@voodoogq/plugin-dependency-packages-common';
 import { PACKAGE_DEPS_NPM_ANNOTATION } from '../constants';
-import fs from 'fs';
+import fs from 'fs/promises';
 
 export interface PackageJsonRetrieverOptions {
   logger: LoggerService;
@@ -15,8 +15,8 @@ export class PackageJsonRetriever implements DependencyTypeRetriever {
     this.logger = options.logger;
   }
 
-  async retrieve(entities: ComponentEntity[]): Promise<any> {
-    return entities.map((entity: ComponentEntity) => {
+  public async retrieve(entities: ComponentEntity[]): Promise<any> {
+    return Promise.all(entities.map(async (entity: ComponentEntity) => {
       const packageLocation = entity.metadata.annotations?.[PACKAGE_DEPS_NPM_ANNOTATION];
 
       if (!packageLocation) {
@@ -26,7 +26,7 @@ export class PackageJsonRetriever implements DependencyTypeRetriever {
       let response: { dependencies: [string, string][]; devDependencies: [string, string][] } = { dependencies: [], devDependencies: [] };
 
       if(packageLocation.startsWith('file:')) {
-        const data = fs.readFileSync(packageLocation.replace('file:', ''), 'utf8');
+        const data = await fs.readFile(packageLocation.replace('file:', ''), 'utf8');
         const parsed = JSON.parse(data);
         const dependencies: [string, string][] = Object.entries(parsed.dependencies)
         const devDependencies: [string, string][] = Object.entries(parsed.devDependencies)
@@ -37,6 +37,6 @@ export class PackageJsonRetriever implements DependencyTypeRetriever {
       }
 
       return response;
-    });
+    }));
   }
 }
