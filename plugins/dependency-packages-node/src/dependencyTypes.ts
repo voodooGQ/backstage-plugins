@@ -1,11 +1,13 @@
 import { HumanDuration } from '@backstage/types';
 import { DependencyTypeSchema, DependencyTypeRetriever } from '@voodoogq/plugin-dependency-packages-common';
 import { Duration } from 'luxon';
+import express from 'express';
 
 export type DependencyType= {
   id: string;
   version: string;
-  retriever: DependencyTypeRetriever;
+  annotation: string;
+  router: express.Router;
   title?: string;
   description?: string;
   schema?: DependencyTypeSchema;

@@ -4,6 +4,8 @@ import { LoggerService } from '@backstage/backend-plugin-api';
 import { z } from 'zod';
 import { InputError } from '@backstage/errors';
 import { PackageJsonRetriever } from './retriever/PackageJsonRetriever';
+import { ComponentEntity } from '@backstage/catalog-model';
+import { PACKAGE_DEPS_NPM_ANNOTATION } from './constants';
 
 export interface RouterOptions {
   logger: LoggerService;
@@ -14,25 +16,29 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
   router.use(express.json());
 
   router.post('/retrieve', async (req, res) => {
-    // const retrieveSchema = z.object({
-    //   entities: z.array(z.object({
-    //     metadata: z.object({
-    //       annotations: z.object({
-    //         'package-deps/npm': z.string(),
-    //       }),
-    //     }),
-    //   })),
-    // });
+    // Make sure we have a Component Entity with the write annotations
+    const schema = z.object({
+      entities: z.array(
+        z.object({
+          kind: z.literal('Component'),
+          metadata: z.object({
+            annotations: z.object({
+              [PACKAGE_DEPS_NPM_ANNOTATION]: z.string()
+            }).passthrough(),
+          }).passthrough()
+        }).passthrough()
+      )
+    })
 
-    // const parsed = retrieveSchema.safeParse(req.body);
+    const parsed = schema.safeParse(req.body);
 
-    // if (!parsed.success) {
-    //   throw new InputError(parsed.error.toString());
-    // }
+    if (!parsed.success) {
+      throw new InputError(parsed.error.toString());
+    }
 
     logger.info('Retrieving NPM Entities');
     const retriever = new PackageJsonRetriever({ logger });
-    const entities = await retriever.retrieve(req.body.entities);
+    const entities = await retriever.retrieve(parsed.data.entities as unknown as ComponentEntity[]);
     res.status(201).json({ message: 'success', data: entities });
   });
 

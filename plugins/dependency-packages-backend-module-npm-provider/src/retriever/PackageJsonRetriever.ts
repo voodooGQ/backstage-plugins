@@ -1,6 +1,7 @@
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { ComponentEntity } from '@backstage/catalog-model';
 import { DependencyTypeRetriever } from '@voodoogq/plugin-dependency-packages-common';
+import { PACKAGE_DEPS_NPM_ANNOTATION } from '../constants';
 import fs from 'fs';
 
 export interface PackageJsonRetrieverOptions {
@@ -20,7 +21,7 @@ export class PackageJsonRetriever implements DependencyTypeRetriever {
     annotation: string;
   } {
     const location = entity.metadata.annotations?.['backstage.io/managed-by-location'];
-    const annotation = entity.metadata.annotations?.['package-deps/npm']
+    const annotation = entity.metadata.annotations?.[PACKAGE_DEPS_NPM_ANNOTATION]
 
     if (!location || !annotation) {
       throw new Error('Missing annotations');
@@ -42,6 +43,7 @@ export class PackageJsonRetriever implements DependencyTypeRetriever {
   }
 
   async retrieve(entities: ComponentEntity[]): Promise<any> {
+    console.log(entities)
     return entities.map((entity: ComponentEntity) => {
       const packageLocation = this.getPackageLocation(
         this.transformEntityData(entity)

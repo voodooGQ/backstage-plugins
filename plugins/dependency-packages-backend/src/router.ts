@@ -15,7 +15,10 @@ export async function createRouter({ dependencyTypes }: RouterOptions): Promise<
   router.use(express.json());
 
   router.get('/dependency-types', async (_req, res) => {
-    const data = dependencyTypes.map(type => type.dependencyType.id);
+    const data = dependencyTypes.map(type => ({
+      id: type.dependencyType.id,
+      annotation: type.dependencyType.annotation
+    }));
     res.status(201).json({ message: 'success', data });
   });
 

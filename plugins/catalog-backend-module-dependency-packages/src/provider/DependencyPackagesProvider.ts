@@ -85,16 +85,16 @@ export class DependencyPackagesProvider {
     const dependencyTypesData = await dependencyTypesResponse.json();
     const dependencyTypes = dependencyTypesData.data;
 
-    dependencyTypes.forEach(async (dependencyType: string) => {
+    dependencyTypes.forEach(async (dependencyType: { id: string; annotation: string }) => {
       const filteredEntities = entities.items.filter(entity => {
-        return entity.metadata.annotations?.[`package-deps/${dependencyType}`];
+        return entity.metadata.annotations?.[dependencyType.annotation];
       });
       const body = JSON.stringify({
         entities: filteredEntities
       });
 
       const dependencyEntitiesResponse = await fetch(
-        `${this.backendUrl}/${dependencyType}/retrieve`, {
+        `${this.backendUrl}/${dependencyType.id}/retrieve`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
