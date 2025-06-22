@@ -10,17 +10,19 @@ export class DependencyReferenceParser {
   public parse(dependencyReferences: DependencyReference[]): Promise<ParsedDependencies> {
     dependencyReferences.forEach(dependencyReference => {
       dependencyReference.dependencies.forEach(dependency => {
-        const existingDep = this.parsedDependencies[dependency[0]];
+        const [name, version] = dependency;
+
+        const existingDep = this.parsedDependencies[name];
         const versionReference = {
           entityRef: dependencyReference.entityRef,
-          version: dependency[1],
+          version,
           type: 'dependency' as const,
         };
 
         if(existingDep) {
           existingDep.versionReferences.push(versionReference);
         } else {
-          this.parsedDependencies[dependency[0]] = {
+          this.parsedDependencies[name] = {
             versionReferences: [ versionReference ],
           };
         }

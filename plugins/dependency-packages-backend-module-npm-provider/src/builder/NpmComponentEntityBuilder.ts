@@ -11,11 +11,6 @@ export class NpmComponentEntityBuilder {
     kind: 'Component',
     metadata: {
       packageVersionReferences: [],
-      annotations: {
-        // TODO: This can probably be populated with the actual package address once we make network requests to their server
-        [ANNOTATION_LOCATION]: 'url:https://www.npmjs.com/',
-        [ANNOTATION_ORIGIN_LOCATION]: 'url:https://www.npmjs.com/',
-      }
     },
     spec: {
       type: 'packageDependency',
@@ -38,6 +33,10 @@ export class NpmComponentEntityBuilder {
   private nameMutation(name: string): string {
     const packageName = name.replace('@', 'at_').replace('/', '-');
     return `dep.npm.${packageName}`
+  }
+
+  private npmRegistryUrl(name: string): string {
+    return `https://www.npmjs.com/package/${name}`;
   }
 
   private sourceLocationParser(sourceLocation: NpmRegistryResponse['repository']): string {
@@ -78,7 +77,7 @@ export class NpmComponentEntityBuilder {
 
   private compileLinks(meta: NpmRegistryResponse): { url: string, title: string }[] {
     const links: { url: string, title: string }[] = [
-      { url: `https://www.npmjs.com/package/${meta.name}`, title: 'NPM' }
+      { url: this.npmRegistryUrl(meta.name), title: 'NPM' }
     ];
 
     if (meta.repository) {
@@ -127,6 +126,8 @@ export class NpmComponentEntityBuilder {
           links: this.compileLinks(meta),
           annotations: {
             ...this.template.metadata?.annotations,
+            [ANNOTATION_LOCATION]: `url:${this.npmRegistryUrl(key)}`,
+            [ANNOTATION_ORIGIN_LOCATION]: `url:${this.npmRegistryUrl(key)}`,
             [ANNOTATION_SOURCE_LOCATION]: this.sourceLocationParser(meta.repository),
           }
         },
