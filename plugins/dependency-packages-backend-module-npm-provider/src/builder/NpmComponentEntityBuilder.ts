@@ -1,5 +1,6 @@
-import { ComponentEntity, ANNOTATION_LOCATION, ANNOTATION_ORIGIN_LOCATION } from "@backstage/catalog-model";
+import { ComponentEntity, ANNOTATION_LOCATION, ANNOTATION_ORIGIN_LOCATION, ANNOTATION_SOURCE_LOCATION } from "@backstage/catalog-model";
 import { EntityTemplate, ParsedDependencies } from "@voodoogq/plugin-dependency-packages-common";
+import { RegistryMetaRetriever } from "../retriever/RegistryMetaRetriever";
 
 export class NpmComponentEntityBuilder {
   private builtEntities: ComponentEntity[] = [];
@@ -25,8 +26,11 @@ export class NpmComponentEntityBuilder {
     },
   };
 
+  private registryMetaRetriever: RegistryMetaRetriever;
+
   constructor() {
     this.builtEntities = [];
+    this.registryMetaRetriever = new RegistryMetaRetriever();
   }
 
   // TODO: need to do some more name massaging, needs to be below 63 characters
@@ -35,17 +39,30 @@ export class NpmComponentEntityBuilder {
     return `packageDep.npm.${packageName}`
   }
 
-  public build(parsedDependencies: ParsedDependencies): ComponentEntity[] {
+  public async build(parsedDependencies: ParsedDependencies): Promise<ComponentEntity[]> {
     const keys = Object.keys(parsedDependencies);
-    keys.forEach(key => {
+
+    await Promise.all(keys.map(async key => {
+      const meta = await this.registryMetaRetriever.retrieve(key);
+      if (key === '@mui/material') {
+        console.log(meta);
+      }
+
       const entityRefs = parsedDependencies[key].versionReferences.map(versionReference => versionReference.entityRef);
       const entity = {
         ...this.template,
         metadata: {
           ...this.template.metadata,
           name: this.nameMutation(key),
+          description: meta.description,
           title: `dep:npm:${key}`,
-          packageVersionReferences: parsedDependencies[key].versionReferences
+          packageVersionReferences: parsedDependencies[key].versionReferences,
+          annotations: {
+            ...this.template.metadata?.annotations,
+            // TODO: Massage this, current structure:
+            // { url: 'git+https://github.com/facebook/react.git', type: 'git', directory: 'packages/react' }
+            [ANNOTATION_SOURCE_LOCATION]: `${meta.repository.url}`,
+          }
         },
         spec: {
           ...this.template.spec,
@@ -53,7 +70,8 @@ export class NpmComponentEntityBuilder {
         }
       } as ComponentEntity;
       this.builtEntities.push(entity);
-    });
+    }));
+
     return this.builtEntities;
   }
 }

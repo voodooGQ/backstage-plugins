@@ -8,7 +8,6 @@ import {
   AuthService,
   LoggerService,
 } from '@backstage/backend-plugin-api';
-import fs from 'fs';
 import { ComponentEntity } from '@backstage/catalog-model';
 
 export interface DependencyPackageProviderOptions {
@@ -109,10 +108,10 @@ export class DependencyPackagesProvider {
       const dependencyEntities = dependencyEntitiesPayload.data;
       // TODO: Take off override on connection
       await this.connection!.applyMutation({
+        // TODO: Maybe delta is better?
         type: 'full',
         entities: dependencyEntities.map((entity: ComponentEntity) => ({
           entity,
-          type: 'full',
           locationKey: `dependency-packages-provider:${this.env}`,
         })),
       });

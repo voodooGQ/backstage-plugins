@@ -44,7 +44,7 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
     const parser = new DependencyReferenceParser();
     const parsedDeps = await parser.parse(deps);
     const builder = new NpmComponentEntityBuilder();
-    const entities = builder.build(parsedDeps);
+    const entities = await builder.build(parsedDeps);
 
     res.status(201).json({ message: 'success', data: entities });
   });
