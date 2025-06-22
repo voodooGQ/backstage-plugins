@@ -1,4 +1,4 @@
-import { ComponentEntity } from "@backstage/catalog-model";
+import { ComponentEntity, ANNOTATION_LOCATION, ANNOTATION_ORIGIN_LOCATION } from "@backstage/catalog-model";
 import { EntityTemplate, ParsedDependencies } from "@voodoogq/plugin-dependency-packages-common";
 
 export class NpmComponentEntityBuilder {
@@ -9,13 +9,18 @@ export class NpmComponentEntityBuilder {
     kind: 'Component',
     metadata: {
       packageVersionReferences: [],
+      annotations: {
+        // TODO: This can probably be populated with the actual package address once we make network requests to their server
+        [ANNOTATION_LOCATION]: 'url:https://www.npmjs.com/',
+        [ANNOTATION_ORIGIN_LOCATION]: 'url:https://www.npmjs.com/',
+      }
     },
     spec: {
       type: 'packageDependency',
       // TODO: Need a way to set a default group
       owner: 'guests',
       // TODO: Need a way to set a default lifecycle
-      lifecycle: 'experimental',
+      lifecycle: 'external',
       dependencyOf: []
     },
   };
@@ -24,8 +29,10 @@ export class NpmComponentEntityBuilder {
     this.builtEntities = [];
   }
 
-  private nameMutation(name: string) {
-    return `packageDep:npm:${name}`
+  // TODO: need to do some more name massaging, needs to be below 63 characters
+  private nameMutation(name: string): string {
+    const packageName = name.replace('@', 'at_').replace('/', '-');
+    return `packageDep.npm.${packageName}`
   }
 
   public build(parsedDependencies: ParsedDependencies): ComponentEntity[] {
@@ -35,7 +42,10 @@ export class NpmComponentEntityBuilder {
       const entity = {
         ...this.template,
         metadata: {
-          name: this.nameMutation(key)
+          ...this.template.metadata,
+          name: this.nameMutation(key),
+          title: `dep:npm:${key}`,
+          packageVersionReferences: parsedDependencies[key].versionReferences
         },
         spec: {
           ...this.template.spec,

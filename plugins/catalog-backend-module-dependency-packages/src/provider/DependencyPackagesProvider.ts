@@ -9,6 +9,7 @@ import {
   LoggerService,
 } from '@backstage/backend-plugin-api';
 import fs from 'fs';
+import { ComponentEntity } from '@backstage/catalog-model';
 
 export interface DependencyPackageProviderOptions {
   env: string;
@@ -106,23 +107,15 @@ export class DependencyPackagesProvider {
 
       const dependencyEntitiesPayload = await dependencyEntitiesResponse.json();
       const dependencyEntities = dependencyEntitiesPayload.data;
-      console.log(dependencyEntities)
+      // TODO: Take off override on connection
+      await this.connection!.applyMutation({
+        type: 'full',
+        entities: dependencyEntities.map((entity: ComponentEntity) => ({
+          entity,
+          type: 'full',
+          locationKey: `dependency-packages-provider:${this.env}`,
+        })),
+      });
     });
-    // const response = await this.reader.readUrl(
-    //   `https://frobs-${this.env}.example.com/data`,
-    // );
-    // const data = JSON.parse((await response.buffer()).toString());
-
-    // /** [5] */
-    // const entities: Entity[] = frobsToEntities(data);
-
-    // /** [6] */
-    // await this.connection.applyMutation({
-    //   type: 'full',
-    //   entities: entities.map(entity => ({
-    //     entity,
-    //     locationKey: `frobs-provider:${this.env}`,
-    //   })),
-    // });
   }
 }

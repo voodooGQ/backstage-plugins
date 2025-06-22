@@ -7,6 +7,7 @@ import { PackageJsonRetriever } from './retriever/PackageJsonRetriever';
 import { ComponentEntity } from '@backstage/catalog-model';
 import { PACKAGE_DEPS_NPM_ANNOTATION } from './constants';
 import { DependencyReferenceParser } from './parser/DependencyReferenceParser';
+import { NpmComponentEntityBuilder } from './builder/NpmComponentEntityBuilder';
 
 export interface RouterOptions {
   logger: LoggerService;
@@ -42,7 +43,10 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
     const deps = await retriever.retrieve(parsed.data.entities as unknown as ComponentEntity[]);
     const parser = new DependencyReferenceParser();
     const parsedDeps = await parser.parse(deps);
-    res.status(201).json({ message: 'success', data: parsedDeps });
+    const builder = new NpmComponentEntityBuilder();
+    const entities = builder.build(parsedDeps);
+
+    res.status(201).json({ message: 'success', data: entities });
   });
 
   return router;
