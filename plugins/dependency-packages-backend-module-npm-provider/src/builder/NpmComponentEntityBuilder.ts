@@ -41,18 +41,18 @@ export class NpmComponentEntityBuilder {
 
   private sourceLocationParser(sourceLocation: NpmRegistryResponse['repository']): string {
     if (typeof sourceLocation === 'string') {
-      return sourceLocation;
+      return this.gitToHttpUrl(sourceLocation);
     }
 
     // TODO: Not sure if this will be right since it'll have `.git` at the end, verify
     if (sourceLocation.directory) {
-      return `${sourceLocation.url}/${sourceLocation.directory}`;
+      return this.gitToHttpUrl(`${sourceLocation.url}`, sourceLocation.directory);
     }
 
-    return sourceLocation.url;
+    return this.gitToHttpUrl(sourceLocation.url);
   }
 
-  private gitToHttpUrl(gitUrl: string): string {
+  private gitToHttpUrl(gitUrl: string, path?: string): string {
     // 1. Strip the git+ prefix
     let url = gitUrl.replace(/^git\+/, '');
 
@@ -67,9 +67,19 @@ export class NpmComponentEntityBuilder {
     // 3. Strip .git suffix
     url = url.replace(/\.git$/, '');
 
-    // 4. Append branch for platforms like GitHub
-    if (branch && url.includes('github.com')) {
-      url = `${url}/tree/${branch}`;
+    // 4. Build final URL
+    if (url.includes('github.com')) {
+      if (branch) {
+        url = `${url}/tree/${branch}`;
+      }
+      if (path) {
+        url = `${url}/${path.replace(/^\/+/, '')}`;
+      }
+    } else {
+      // Other platforms can be added here if needed
+      if (path) {
+        url = `${url}/${path.replace(/^\/+/, '')}`;
+      }
     }
 
     return url;
@@ -81,7 +91,7 @@ export class NpmComponentEntityBuilder {
     ];
 
     if (meta.repository) {
-      links.push({ url: this.gitToHttpUrl(this.sourceLocationParser(meta.repository)), title: 'Source' });
+      links.push({ url: this.sourceLocationParser(meta.repository), title: 'Source' });
     }
 
     if (meta.bugs) {
@@ -103,7 +113,7 @@ export class NpmComponentEntityBuilder {
     }
 
     if (meta.readmeFilename) {
-      links.push({ url: `${this.gitToHttpUrl(this.sourceLocationParser(meta.repository))}/${meta.readmeFilename}`, title: 'Readme' });
+      links.push({ url: this.gitToHttpUrl(this.sourceLocationParser(meta.repository), meta.readmeFilename), title: 'Readme' });
     }
 
     return links;
