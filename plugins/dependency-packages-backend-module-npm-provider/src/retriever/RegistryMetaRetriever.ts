@@ -1,5 +1,7 @@
+import { NpmRegistryResponse } from "../types/NpmRegistry";
+
 export class RegistryMetaRetriever {
-  public async retrieve(packageName: string) {
+  public async retrieve(packageName: string): Promise<NpmRegistryResponse> {
     const registryResponse = await fetch(
       `https://registry.npmjs.org/${packageName}`, {
         method: 'GET',

@@ -53,3 +53,5 @@ site
 e2e-test-report/
 
 .envrc
+
+.local
