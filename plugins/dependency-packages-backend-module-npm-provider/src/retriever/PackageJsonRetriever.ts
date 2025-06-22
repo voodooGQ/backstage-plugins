@@ -23,20 +23,16 @@ export class PackageJsonRetriever implements DependencyTypeRetriever {
         throw new Error('Missing location');
       }
 
-      let response: { dependencies: [string, string][]; devDependencies: [string, string][] } = { dependencies: [], devDependencies: [] };
-
       if(packageLocation.startsWith('file:')) {
         const data = await fs.readFile(packageLocation.replace('file:', ''), 'utf8');
         const parsed = JSON.parse(data);
         const dependencies: [string, string][] = Object.entries(parsed.dependencies)
         const devDependencies: [string, string][] = Object.entries(parsed.devDependencies)
-        response = {
+        return {
           dependencies,
           devDependencies,
         }
       }
-
-      return response;
     }));
   }
 }
