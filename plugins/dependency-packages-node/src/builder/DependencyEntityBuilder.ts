@@ -1,4 +1,4 @@
-import { ComponentEntity } from '@backstage/catalog-model';
+import { ComponentEntity, GroupEntity } from '@backstage/catalog-model';
 import { EntityTemplate, ParsedDependencies } from '@voodoogq/plugin-dependency-packages-common';
 
 // TOOD: Add an implements later
@@ -15,8 +15,6 @@ export class DependencyEntityBuilder {
     },
     spec: {
       type: 'packageDependency',
-      // TODO: Need a way to set a default group
-      owner: 'guests',
       // TODO: Need a way to set a default lifecycle
       lifecycle: 'external',
       dependencyOf: []
@@ -65,7 +63,7 @@ export class DependencyEntityBuilder {
     return url;
   }
 
-  public async build(_parsedDependencies: ParsedDependencies): Promise<ComponentEntity[]> {
+  public async build(_parsedDependencies: ParsedDependencies, _defaultOwner: GroupEntity): Promise<ComponentEntity[]> {
     return this.builtEntities;
   }
 }

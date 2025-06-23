@@ -4,7 +4,7 @@ import { LoggerService } from '@backstage/backend-plugin-api';
 import { z } from 'zod';
 import { InputError } from '@backstage/errors';
 import { PackageJsonRetriever } from './retriever/PackageJsonRetriever';
-import { ComponentEntity } from '@backstage/catalog-model';
+import { ComponentEntity, GroupEntity } from '@backstage/catalog-model';
 import { PACKAGE_DEPS_NPM_ANNOTATION } from './constants';
 import { DependencyReferenceParser } from './parser/DependencyReferenceParser';
 import { NpmComponentEntityBuilder } from './builder/NpmComponentEntityBuilder';
@@ -29,7 +29,10 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
             }).passthrough(),
           }).passthrough()
         }).passthrough()
-      )
+      ),
+      defaultOwner: z.object({
+        kind: z.literal('Group'),
+      }).passthrough()
     })
 
     const parsed = schema.safeParse(req.body);
@@ -44,7 +47,7 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
     const parser = new DependencyReferenceParser();
     const parsedDeps = await parser.parse(deps);
     const builder = new NpmComponentEntityBuilder();
-    const entities = await builder.build(parsedDeps);
+    const entities = await builder.build(parsedDeps, parsed.data.defaultOwner as unknown as GroupEntity);
 
     res.status(201).json({ message: 'success', data: entities });
   });

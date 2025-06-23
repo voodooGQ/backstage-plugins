@@ -1,4 +1,4 @@
-import { ComponentEntity, ANNOTATION_LOCATION, ANNOTATION_ORIGIN_LOCATION, ANNOTATION_SOURCE_LOCATION } from "@backstage/catalog-model";
+import { ComponentEntity, ANNOTATION_LOCATION, ANNOTATION_ORIGIN_LOCATION, ANNOTATION_SOURCE_LOCATION, GroupEntity } from "@backstage/catalog-model";
 import { ParsedDependencies } from "@voodoogq/plugin-dependency-packages-common";
 import { RegistryMetaRetriever } from "../retriever/RegistryMetaRetriever";
 import { NpmRegistryResponse } from "../types/NpmRegistry";
@@ -68,7 +68,7 @@ export class NpmComponentEntityBuilder extends DependencyEntityBuilder {
     return links;
   }
 
-  public async build(parsedDependencies: ParsedDependencies): Promise<ComponentEntity[]> {
+  public async build(parsedDependencies: ParsedDependencies, defaultOwner: GroupEntity): Promise<ComponentEntity[]> {
     const keys = Object.keys(parsedDependencies);
 
     await Promise.all(keys.map(async key => {
@@ -92,6 +92,7 @@ export class NpmComponentEntityBuilder extends DependencyEntityBuilder {
         },
         spec: {
           ...this.template.spec,
+          owner: defaultOwner.metadata.name,
           dependencyOf: entityRefs
         }
       } as ComponentEntity;

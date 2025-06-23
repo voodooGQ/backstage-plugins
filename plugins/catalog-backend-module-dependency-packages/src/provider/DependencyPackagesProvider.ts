@@ -65,6 +65,17 @@ export class DependencyPackagesProvider {
       onBehalfOf: credentials,
     })
 
+    const defaultOwnerResponse = await fetch(
+      `${this.backendUrl}/default-owner`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+    const defaultOwnerData = await defaultOwnerResponse.json();
+    const defaultOwner = defaultOwnerData.data;
+
     const entities = await this.catalog.getEntities({
       filter: [
         {
@@ -89,7 +100,8 @@ export class DependencyPackagesProvider {
         return entity.metadata.annotations?.[dependencyType.annotation];
       });
       const body = JSON.stringify({
-        entities: filteredEntities
+        entities: filteredEntities,
+        defaultOwner,
       });
 
       const dependencyEntitiesResponse = await fetch(
