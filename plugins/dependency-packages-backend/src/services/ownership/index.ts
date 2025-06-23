@@ -1,1 +1,0 @@
-export { retrieveDefaultOwnerEntity } from './retrieveDefaultOwnerEntity';

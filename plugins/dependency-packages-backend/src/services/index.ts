@@ -1,1 +1,3 @@
-export * from './dependencyType';
+export * from './createDependencyTypeRegistration';
+export * from './DependencyTypeRegistry';
+export * from './retrieveDefaultOwnerEntity';

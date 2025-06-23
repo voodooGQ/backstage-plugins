@@ -3,7 +3,7 @@ import Router from 'express-promise-router';
 import { DependencyTypeRegistration } from '@voodoogq/plugin-dependency-packages-node';
 import { HttpAuthService, LoggerService, PermissionsService } from '@backstage/backend-plugin-api';
 import { BaseConfig } from '@voodoogq/plugin-dependency-packages-common';
-import { retrieveDefaultOwnerEntity } from './services/ownership/retrieveDefaultOwnerEntity';
+import { retrieveDefaultOwnerEntity } from './services/retrieveDefaultOwnerEntity';
 import { AuthService } from '@backstage/backend-plugin-api';
 import { CatalogService } from '@backstage/plugin-catalog-node';
 
