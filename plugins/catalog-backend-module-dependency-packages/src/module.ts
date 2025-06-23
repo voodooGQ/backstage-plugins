@@ -5,6 +5,7 @@ import {
 import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
 import { catalogServiceRef } from "@backstage/plugin-catalog-node";
 import { DependencyPackagesProvider } from './provider/DependencyPackagesProvider';
+import { OwnershipProvider } from './provider/OwnershipProvider';
 
 export const catalogModuleDependencyPackages = createBackendModule({
   pluginId: 'catalog',
@@ -26,7 +27,17 @@ export const catalogModuleDependencyPackages = createBackendModule({
           frequency: { seconds: 10 },
           timeout: { minutes: 1 },
         });
-        const provider = new DependencyPackagesProvider({
+        // Create default owner if needed
+        const ownershipProvider = new OwnershipProvider({
+          auth,
+          catalog,
+          logger,
+          backendUrl,
+        });
+        builder.addEntityProvider(ownershipProvider);
+
+        // Create dependency packages
+        const dependencyPackageProvider = new DependencyPackagesProvider({
           env: 'local',
           catalog,
           reader,
@@ -35,7 +46,7 @@ export const catalogModuleDependencyPackages = createBackendModule({
           taskRunner,
           backendUrl,
         });
-        builder.addEntityProvider(provider);
+        builder.addEntityProvider(dependencyPackageProvider);
       },
     });
   },

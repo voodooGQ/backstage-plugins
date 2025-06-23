@@ -20,7 +20,6 @@ export interface DependencyPackageProviderOptions {
   backendUrl: string;
 }
 
-
 export class DependencyPackagesProvider {
   private readonly env: string;
   private readonly catalog: CatalogService;
@@ -106,8 +105,8 @@ export class DependencyPackagesProvider {
 
       const dependencyEntitiesPayload = await dependencyEntitiesResponse.json();
       const dependencyEntities = dependencyEntitiesPayload.data;
-      // TODO: Take off override on connection
-      await this.connection!.applyMutation({
+
+      await this.connection?.applyMutation({
         // TODO: Maybe delta is better?
         type: 'full',
         entities: dependencyEntities.map((entity: ComponentEntity) => ({

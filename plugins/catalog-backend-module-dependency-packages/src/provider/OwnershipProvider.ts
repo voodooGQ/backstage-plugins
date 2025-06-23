@@ -2,7 +2,7 @@ import { CatalogService } from "@backstage/plugin-catalog-node";
 import { LoggerService } from "@backstage/backend-plugin-api";
 import { EntityProviderConnection } from "@backstage/plugin-catalog-node";
 import { AuthService } from "@backstage/backend-plugin-api";
-import { BaseConfig } from '@voodoogq/plugin-dependency-packages-common';
+import { BaseConfig, Defineable } from '@voodoogq/plugin-dependency-packages-common';
 import { GroupEntity } from "@backstage/catalog-model";
 
 export interface OwnershipProviderOptions {
@@ -63,19 +63,19 @@ export class OwnershipProvider {
     }
   }
 
-  private async getOwner(ownerConfig: BaseConfig['ownerConfig']): Promise<GroupEntity> {
+  private async verifyOwner(name: string): Promise<Defineable<GroupEntity>> {
     const owner = await this.catalog.getEntityByRef({
       kind: 'Group',
-      name: ownerConfig!,
-      // Set a way to override this
+      name,
+      // TODO: Provide way to override
       namespace: 'default',
     }, { credentials: await this.auth.getOwnServiceCredentials() });
 
-    if (!owner) {
-      throw new Error(`Owner named ${ownerConfig} not found in catalog`)
+    if (owner) {
+      return owner as GroupEntity;
     }
 
-    return owner as GroupEntity;
+    return undefined;
   }
 
   async run(): Promise<void> {
@@ -97,19 +97,19 @@ export class OwnershipProvider {
     const config = configData.data;
 
     const createOwner = config.createOwnerConfig;
-    const defaultOwner = config.ownerConfig;
-
-    let owner: GroupEntity;
-
     if (createOwner && createOwner.enabled) {
-      owner = await this.createOwner(createOwner);
-    // TODO: Actually this isn't necessary since we're providing.
-    // Create only, and then have the backend return the right owner.
-    } else if (defaultOwner) {
-      owner = await this.getOwner(defaultOwner);
+      if (!this.verifyOwner(createOwner.name)) {
+        this.logger.debug(`Creating owner '${createOwner.name}' for dependency package entities...`)
+        const owner = await this.createOwner(createOwner);
+        await this.connection!.applyMutation({
+          // TODO: Maybe delta is better?
+          type: 'full',
+          entities: [{
+            entity: owner,
+            locationKey: `dependency-packages-ownership-provider`,
+          }],
+        });
+      }
     }
-
-
   }
-
 }

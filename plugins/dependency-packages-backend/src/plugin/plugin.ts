@@ -10,8 +10,10 @@ import {
   DependencyTypeRegistry,
   DependencyTypeRegistration
 } from '@voodoogq/plugin-dependency-packages-node';
+import { catalogServiceRef } from "@backstage/plugin-catalog-node";
 import { dependencyPackagesPermissions } from '@voodoogq/plugin-dependency-packages-common';
 import { createDependencyTypeRegistrationFromConfig, createBaseConfig } from './config';
+import { retrieverDefaultOwnerEntity } from '../services/ownership';
 
 export const dependencyPackagesPlugin = createBackendPlugin({
   pluginId: 'dependency-packages',
@@ -37,14 +39,25 @@ export const dependencyPackagesPlugin = createBackendPlugin({
 
     env.registerInit({
       deps: {
+        auth: coreServices.auth,
+        catalog: catalogServiceRef,
         config: coreServices.rootConfig,
-        logger: coreServices.logger,
-        httpRouter: coreServices.httpRouter,
         httpAuth: coreServices.httpAuth,
+        httpRouter: coreServices.httpRouter,
+        logger: coreServices.logger,
         permissions: coreServices.permissions,
         permissionsRegistry: coreServices.permissionsRegistry,
       },
-      async init({ httpRouter, permissionsRegistry, config, logger, permissions, httpAuth }) {
+      async init({
+        auth,
+        catalog,
+        config,
+        httpAuth,
+        httpRouter,
+        logger,
+        permissions,
+        permissionsRegistry,
+      }) {
         logger.info("DEPENDENCY-PACKAGES: Initialized")
 
         permissionsRegistry.addPermissions(dependencyPackagesPermissions);
@@ -66,6 +79,11 @@ export const dependencyPackagesPlugin = createBackendPlugin({
 
         const context = { config };
 
+        const defaultOwner = await retrieverDefaultOwnerEntity({
+          catalog,
+          auth,
+          baseConfig,
+        });
 
         httpRouter.use(
           await createRouter({
@@ -75,6 +93,7 @@ export const dependencyPackagesPlugin = createBackendPlugin({
             permissions,
             dependencyTypes,
             baseConfig,
+            defaultOwner,
           }),
         );
       },
