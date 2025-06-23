@@ -1,7 +1,11 @@
 import express from 'express';
 import Router from 'express-promise-router';
 import { DependencyTypeRegistration } from '@voodoogq/plugin-dependency-packages-node';
-import { HttpAuthService, LoggerService, PermissionsService } from '@backstage/backend-plugin-api';
+import {
+  HttpAuthService,
+  LoggerService,
+  PermissionsService
+} from '@backstage/backend-plugin-api';
 import { BaseConfig } from '@voodoogq/plugin-dependency-packages-common';
 import { retrieveDefaultOwnerEntity } from './services/retrieveDefaultOwnerEntity';
 import { AuthService } from '@backstage/backend-plugin-api';
@@ -12,6 +16,8 @@ export interface RouterOptions {
   dependencyTypes: DependencyTypeRegistration[];
   httpAuth: HttpAuthService;
   logger: LoggerService;
+  // TODO: Need to integration permissions
+
   permissions: PermissionsService;
   auth: AuthService;
   catalog: CatalogService;
@@ -57,7 +63,7 @@ export async function createRouter({
   });
 
   /**
-   * Extend the modules router
+   * Extend the module routers
    */
   dependencyTypes.forEach(type => {
     router.use(`/${type.dependencyType.id}`, type.dependencyType.router);
