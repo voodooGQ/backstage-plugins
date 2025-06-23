@@ -13102,6 +13102,7 @@ __metadata:
     "@backstage/catalog-model": "npm:^1.7.4"
     "@backstage/cli": "npm:^0.32.1"
     "@backstage/plugin-catalog-node": "npm:^1.17.0"
+    "@voodoogq/plugin-dependency-packages-common": "npm:^0.1.0"
     node-fetch: "npm:^3.3.2"
   languageName: unknown
   linkType: soft

@@ -11,7 +11,7 @@ import {
   DependencyTypeRegistration
 } from '@voodoogq/plugin-dependency-packages-node';
 import { dependencyPackagesPermissions } from '@voodoogq/plugin-dependency-packages-common';
-import { createDependencyTypeRegistrationFromConfig } from './config';
+import { createDependencyTypeRegistrationFromConfig, createBaseConfig } from './config';
 
 export const dependencyPackagesPlugin = createBackendPlugin({
   pluginId: 'dependency-packages',
@@ -49,6 +49,8 @@ export const dependencyPackagesPlugin = createBackendPlugin({
 
         permissionsRegistry.addPermissions(dependencyPackagesPermissions);
 
+        const baseConfig = createBaseConfig(config);
+
         const dependencyTypes: DependencyTypeRegistration[] = Object.entries(
           addedDependencyTypes,
         )
@@ -71,7 +73,8 @@ export const dependencyPackagesPlugin = createBackendPlugin({
             httpAuth,
             logger,
             permissions,
-            dependencyTypes
+            dependencyTypes,
+            baseConfig,
           }),
         );
       },

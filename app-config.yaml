@@ -73,11 +73,18 @@ permission:
   enabled: true
 
 dependencyPackages:
-  ruby:
-    cadence: '1h'
-    timeout: { minutes: 1 }
-    initialDelay: { minutes: 1 }
-  npm:
-    cadence: '1h'
-    timeout: { minutes: 1 }
-    initialDelay: { minutes: 1 }
+  owner: guests
+  lifecycle: external
+  createOwner:
+    enabled: false
+    name: dependency-packages
+    description: "Generic owner for Dependency Packages"
+  providers:
+    ruby:
+      cadence: '1h'
+      timeout: { minutes: 1 }
+      initialDelay: { minutes: 1 }
+    npm:
+      cadence: '1h'
+      timeout: { minutes: 1 }
+      initialDelay: { minutes: 1 }

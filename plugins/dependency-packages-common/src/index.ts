@@ -1,3 +1,3 @@
-export * from './types/dependencyTypes';
+export * from './types';
 export * from './permissions';
 
