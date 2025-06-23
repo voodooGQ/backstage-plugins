@@ -91,7 +91,7 @@ export function createBaseConfig(config: Config): {
   const createOwnerConfig = readCreateOwnerConfig(config);
 
   if (!ownerConfig && !createOwnerConfig) {
-    throw new Error("Must have a defaultOwner or createOwner config value enabled");
+    throw new Error("Must have an owner or createOwner config value enabled");
   }
 
   return {

@@ -4,20 +4,25 @@ import { DependencyTypeRegistration } from '@voodoogq/plugin-dependency-packages
 import { HttpAuthService, LoggerService, PermissionsService } from '@backstage/backend-plugin-api';
 import { BaseConfig } from '@voodoogq/plugin-dependency-packages-common';
 import { GroupEntity } from '@backstage/catalog-model';
+import { retrieverDefaultOwnerEntity } from './services/ownership/retrieveDefaultOwnerEntity';
+import { AuthService } from '@backstage/backend-plugin-api';
+import { CatalogService } from '@backstage/plugin-catalog-node';
 
 export interface RouterOptions {
   baseConfig: BaseConfig;
-  defaultOwner: GroupEntity;
   dependencyTypes: DependencyTypeRegistration[];
   httpAuth: HttpAuthService;
   logger: LoggerService;
   permissions: PermissionsService;
+  auth: AuthService;
+  catalog: CatalogService;
 }
 
 export async function createRouter({
   baseConfig,
-  defaultOwner,
   dependencyTypes,
+  catalog,
+  auth,
 }: RouterOptions): Promise<express.Router> {
   const router = Router();
   router.use(express.json());
@@ -33,6 +38,11 @@ export async function createRouter({
    * Return the default owner group entity
    */
   router.get('/default-owner', async (_req, res) => {
+    const defaultOwner = await retrieverDefaultOwnerEntity({
+      catalog,
+      auth,
+      baseConfig,
+    });
     res.status(201).json({ message: 'success', data: defaultOwner });
   })
 

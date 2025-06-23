@@ -73,12 +73,7 @@ permission:
   enabled: true
 
 dependencyPackages:
-  owner: guests
-  lifecycle: external
-  createOwner:
-    enabled: false
-    name: dependency-packages
-    description: "Generic owner for Dependency Packages"
+  owner: 'acme-corp'
   providers:
     ruby:
       cadence: '1h'

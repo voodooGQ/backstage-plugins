@@ -13,7 +13,6 @@ import {
 import { catalogServiceRef } from "@backstage/plugin-catalog-node";
 import { dependencyPackagesPermissions } from '@voodoogq/plugin-dependency-packages-common';
 import { createDependencyTypeRegistrationFromConfig, createBaseConfig } from './config';
-import { retrieverDefaultOwnerEntity } from '../services/ownership';
 
 export const dependencyPackagesPlugin = createBackendPlugin({
   pluginId: 'dependency-packages',
@@ -79,12 +78,6 @@ export const dependencyPackagesPlugin = createBackendPlugin({
 
         const context = { config };
 
-        const defaultOwner = await retrieverDefaultOwnerEntity({
-          catalog,
-          auth,
-          baseConfig,
-        });
-
         httpRouter.use(
           await createRouter({
             ...context,
@@ -93,7 +86,8 @@ export const dependencyPackagesPlugin = createBackendPlugin({
             permissions,
             dependencyTypes,
             baseConfig,
-            defaultOwner,
+            auth,
+            catalog,
           }),
         );
       },
