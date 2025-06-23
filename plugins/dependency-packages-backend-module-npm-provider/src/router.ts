@@ -30,9 +30,10 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
           }).passthrough()
         }).passthrough()
       ),
-      defaultOwner: z.object({
+      owner: z.object({
         kind: z.literal('Group'),
-      }).passthrough()
+      }).passthrough(),
+      lifecycle: z.string().optional(),
     })
 
     const parsed = schema.safeParse(req.body);
@@ -47,7 +48,11 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
     const parser = new DependencyReferenceParser();
     const parsedDeps = await parser.parse(deps);
     const builder = new NpmComponentEntityBuilder();
-    const entities = await builder.build(parsedDeps, parsed.data.defaultOwner as unknown as GroupEntity);
+    const entities = await builder.build({
+      parsedDependencies: parsedDeps,
+      owner: parsed.data.owner as unknown as GroupEntity,
+      lifecycle: parsed.data.lifecycle,
+    });
 
     res.status(201).json({ message: 'success', data: entities });
   });

@@ -4,18 +4,14 @@ import {
 } from '@backstage/plugin-catalog-node';
 import {
   SchedulerServiceTaskRunner,
-  UrlReaderService,
   AuthService,
-  LoggerService,
 } from '@backstage/backend-plugin-api';
 import { ComponentEntity } from '@backstage/catalog-model';
 
 export interface DependencyPackageProviderOptions {
   env: string;
   catalog: CatalogService;
-  reader: UrlReaderService;
   auth: AuthService;
-  logger: LoggerService;
   taskRunner: SchedulerServiceTaskRunner;
   backendUrl: string;
 }
@@ -23,8 +19,6 @@ export interface DependencyPackageProviderOptions {
 export class DependencyPackagesProvider {
   private readonly env: string;
   private readonly catalog: CatalogService;
-  private readonly reader: UrlReaderService;
-  private readonly logger: LoggerService;
   private readonly auth: AuthService;
   private readonly backendUrl: string;
   private connection?: EntityProviderConnection;
@@ -33,8 +27,6 @@ export class DependencyPackagesProvider {
   constructor(options: DependencyPackageProviderOptions) {
     this.env = options.env;
     this.catalog = options.catalog;
-    this.reader = options.reader;
-    this.logger = options.logger;
     this.auth = options.auth;
     this.taskRunner = options.taskRunner;
     this.backendUrl = options.backendUrl;
@@ -64,6 +56,17 @@ export class DependencyPackagesProvider {
       targetPluginId: 'dependency-packages',
       onBehalfOf: credentials,
     })
+
+    const configResponse = await fetch(
+      `${this.backendUrl}/config`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+    const configData = await configResponse.json();
+    const config = configData.data;
 
     const defaultOwnerResponse = await fetch(
       `${this.backendUrl}/default-owner`, {
@@ -101,7 +104,8 @@ export class DependencyPackagesProvider {
       });
       const body = JSON.stringify({
         entities: filteredEntities,
-        defaultOwner,
+        owner: defaultOwner,
+        lifecycle: config.lifecycleConfig,
       });
 
       const dependencyEntitiesResponse = await fetch(

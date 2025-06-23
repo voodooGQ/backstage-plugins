@@ -68,8 +68,15 @@ export class NpmComponentEntityBuilder extends DependencyEntityBuilder {
     return links;
   }
 
-  public async build(parsedDependencies: ParsedDependencies, defaultOwner: GroupEntity): Promise<ComponentEntity[]> {
+  public async build(options: {
+    parsedDependencies: ParsedDependencies;
+    owner: GroupEntity;
+    lifecycle?: string;
+  }): Promise<ComponentEntity[]> {
+    const { parsedDependencies, owner, lifecycle } = options;
     const keys = Object.keys(parsedDependencies);
+
+    console.log(lifecycle)
 
     await Promise.all(keys.map(async key => {
       const meta = await this.registryMetaRetriever.retrieve(key);
@@ -92,7 +99,8 @@ export class NpmComponentEntityBuilder extends DependencyEntityBuilder {
         },
         spec: {
           ...this.template.spec,
-          owner: defaultOwner.metadata.name,
+          owner: owner.metadata.name,
+          lifecycle: lifecycle || 'experimental',
           dependencyOf: entityRefs
         }
       } as ComponentEntity;

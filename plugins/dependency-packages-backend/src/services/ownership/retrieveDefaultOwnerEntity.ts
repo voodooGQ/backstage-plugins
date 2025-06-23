@@ -30,8 +30,6 @@ export async function retrieverDefaultOwnerEntity(
     namespace: 'default',
   }, { credentials });
 
-  console.log(group)
-
   if (!group) {
     throw new Error(`Could not find owner for dependency packages with name ${name}`);
   }

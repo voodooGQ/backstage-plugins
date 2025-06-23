@@ -15,8 +15,6 @@ export class DependencyEntityBuilder {
     },
     spec: {
       type: 'packageDependency',
-      // TODO: Need a way to set a default lifecycle
-      lifecycle: 'external',
       dependencyOf: []
     },
   };
@@ -63,7 +61,11 @@ export class DependencyEntityBuilder {
     return url;
   }
 
-  public async build(_parsedDependencies: ParsedDependencies, _defaultOwner: GroupEntity): Promise<ComponentEntity[]> {
+  public async build(_options: {
+    parsedDependencies: ParsedDependencies,
+    owner: GroupEntity,
+    lifecycle?: string,
+  }): Promise<ComponentEntity[]> {
     return this.builtEntities;
   }
 }

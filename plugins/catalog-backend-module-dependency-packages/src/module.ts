@@ -13,15 +13,21 @@ export const catalogModuleDependencyPackages = createBackendModule({
   register(reg) {
     reg.registerInit({
       deps: {
-        logger: coreServices.logger,
-        discovery: coreServices.discovery,
+        auth: coreServices.auth,
         builder: catalogProcessingExtensionPoint,
         catalog: catalogServiceRef,
-        reader: coreServices.urlReader,
+        discovery: coreServices.discovery,
+        logger: coreServices.logger,
         scheduler: coreServices.scheduler,
-        auth: coreServices.auth,
       },
-      async init({ builder, catalog, logger, auth, reader, scheduler, discovery }) {
+      async init({
+        auth,
+        builder,
+        catalog,
+        discovery,
+        logger,
+        scheduler,
+      }) {
         const backendUrl = await discovery.getBaseUrl('dependency-packages');
         const taskRunner = scheduler.createScheduledTaskRunner({
           frequency: { seconds: 10 },
@@ -40,9 +46,7 @@ export const catalogModuleDependencyPackages = createBackendModule({
         const dependencyPackageProvider = new DependencyPackagesProvider({
           env: 'local',
           catalog,
-          reader,
           auth,
-          logger,
           taskRunner,
           backendUrl,
         });
