@@ -57,19 +57,20 @@ export function readCreateOwnerConfig(config: Config): {
     return undefined;
   }
 
-  const enabled = createOwnerConfig.getBoolean('enabled');
+  const enabledConfig = createOwnerConfig.getOptionalBoolean('enabled');
+  const enabled = enabledConfig ?? true;
 
   if (enabled) {
     if (!createOwnerConfig.has('name')) {
       throw new Error("Must have a name for createOwner config");
     }
     const name = createOwnerConfig.getString('name');
-    const description = createOwnerConfig.getString('description');
+    const description = createOwnerConfig.getOptionalString('description');
 
     return {
       enabled,
       name,
-      description: description ? description : name,
+      description: description || name,
     };
   }
 

@@ -20,7 +20,9 @@ backend:
     credentials: true
   database:
     client: better-sqlite3
-    connection: ':memory:'
+    connection:
+      directory: "./db"
+    useNullAsDefault: true
   workingDirectory: /tmp
 
 integrations:
@@ -73,8 +75,13 @@ permission:
   enabled: true
 
 dependencyPackages:
-  owner: 'acme-corp'
+  # TODO: Probably should define owner type as well (e.g. User/Group)
+  # owner: 'acme-corp'
   lifecycle: 'external'
+  createOwner:
+    enabled: true
+    name: 'package-dummy'
+    description: "Dummy Group to list out Package Dependencies"
   providers:
     ruby:
       cadence: '1h'

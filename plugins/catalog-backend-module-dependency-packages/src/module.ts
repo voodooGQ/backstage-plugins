@@ -29,9 +29,15 @@ export const catalogModuleDependencyPackages = createBackendModule({
         scheduler,
       }) {
         const backendUrl = await discovery.getBaseUrl('dependency-packages');
-        const taskRunner = scheduler.createScheduledTaskRunner({
+        const ownershipTaskRunner = scheduler.createScheduledTaskRunner({
           frequency: { seconds: 10 },
           timeout: { minutes: 1 },
+          initialDelay: { seconds: 10 }
+        });
+        const depPackagesTaskRunner = scheduler.createScheduledTaskRunner({
+          frequency: { seconds: 10 },
+          timeout: { minutes: 1 },
+          initialDelay: { seconds: 15 }
         });
         // Create default owner if needed
         const ownershipProvider = new OwnershipProvider({
@@ -39,6 +45,7 @@ export const catalogModuleDependencyPackages = createBackendModule({
           catalog,
           logger,
           backendUrl,
+          taskRunner: ownershipTaskRunner,
         });
         builder.addEntityProvider(ownershipProvider);
 
@@ -47,8 +54,8 @@ export const catalogModuleDependencyPackages = createBackendModule({
           env: 'local',
           catalog,
           auth,
-          taskRunner,
           backendUrl,
+          taskRunner: depPackagesTaskRunner,
         });
         builder.addEntityProvider(dependencyPackageProvider);
       },

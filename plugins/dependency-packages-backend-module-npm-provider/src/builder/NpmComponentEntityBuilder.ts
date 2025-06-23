@@ -76,8 +76,6 @@ export class NpmComponentEntityBuilder extends DependencyEntityBuilder {
     const { parsedDependencies, owner, lifecycle } = options;
     const keys = Object.keys(parsedDependencies);
 
-    console.log(lifecycle)
-
     await Promise.all(keys.map(async key => {
       const meta = await this.registryMetaRetriever.retrieve(key);
       const entityRefs = parsedDependencies[key].versionReferences.map(versionReference => versionReference.entityRef);
