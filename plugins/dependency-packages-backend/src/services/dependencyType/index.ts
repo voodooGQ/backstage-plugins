@@ -1,2 +1,2 @@
-export * from './createDependencyTypeRetriever';
+export * from './createDependencyTypeRegistration';
 export * from './DependencyTypeRegistry';

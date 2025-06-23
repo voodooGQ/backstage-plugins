@@ -1,5 +1,4 @@
 import { HumanDuration } from '@backstage/types';
-import { DependencyTypeSchema } from '@voodoogq/plugin-dependency-packages-common';
 import { Duration } from 'luxon';
 import express from 'express';
 
@@ -10,7 +9,6 @@ export type DependencyType= {
   router: express.Router;
   title?: string;
   description?: string;
-  schema?: DependencyTypeSchema;
 };
 
 export type DependencyTypeRegistration = {
@@ -18,7 +16,6 @@ export type DependencyTypeRegistration = {
   cadence?: string;
   timeout?: Duration | HumanDuration;
   initialDelay?: Duration | HumanDuration;
-  schema?: DependencyTypeSchema;
 };
 
 export interface DependencyTypeRegistry {
@@ -26,5 +23,4 @@ export interface DependencyTypeRegistry {
   get(retrieverReference: string): Promise<DependencyTypeRegistration>;
   listDependencyTypes(): Promise<DependencyType[]>;
   listRegistrations(): Promise<DependencyTypeRegistration[]>;
-  getSchemas(): Promise<DependencyTypeSchema[]>;
 }

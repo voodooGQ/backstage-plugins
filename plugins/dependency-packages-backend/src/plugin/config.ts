@@ -4,12 +4,12 @@ import {
   DependencyTypeRegistration,
 } from '@voodoogq/plugin-dependency-packages-node';
 import {
-  createDependencyTypeRetrieverRegistration,
-  DependencyTypeRetrieverRegistrationOptions,
+  createDependencyTypeRegistration,
+  DependencyTypeRegistrationOptions,
 } from '../services';
 
 type DependencyTypeConfig = Omit<
-  DependencyTypeRetrieverRegistrationOptions,
+  DependencyTypeRegistrationOptions,
   'dependencyType'
 >;
 
@@ -110,7 +110,7 @@ export function createDependencyTypeRegistrationFromConfig(
   const dependencyTypeConfig = readDependencyTypeConfig(config, name);
 
   return dependencyTypeConfig
-    ? createDependencyTypeRetrieverRegistration({
+    ? createDependencyTypeRegistration({
         ...dependencyTypeConfig,
         dependencyType,
       })

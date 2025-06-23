@@ -4,25 +4,22 @@ import {
   DependencyTypeRegistration,
 } from '@voodoogq/plugin-dependency-packages-node';
 import { Duration } from 'luxon';
-import { DependencyTypeSchema } from '@voodoogq/plugin-dependency-packages-common';
 
-export type DependencyTypeRetrieverRegistrationOptions = {
+export type DependencyTypeRegistrationOptions = {
   cadence: string;
   dependencyType: DependencyType;
   timeout?: Duration | HumanDuration;
   initialDelay?: Duration | HumanDuration;
-  schema?: DependencyTypeSchema;
 };
 
-export function createDependencyTypeRetrieverRegistration(
-  options: DependencyTypeRetrieverRegistrationOptions,
+export function createDependencyTypeRegistration(
+  options: DependencyTypeRegistrationOptions,
 ): DependencyTypeRegistration {
-  const { cadence, dependencyType, timeout, initialDelay, schema } = options;
+  const { cadence, dependencyType, timeout, initialDelay } = options;
   return {
     cadence,
     dependencyType,
     timeout,
     initialDelay,
-    schema,
   };
 }

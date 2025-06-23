@@ -1,1 +1,1 @@
-export { retrieverDefaultOwnerEntity } from './retrieveDefaultOwnerEntity';
+export { retrieveDefaultOwnerEntity } from './retrieveDefaultOwnerEntity';

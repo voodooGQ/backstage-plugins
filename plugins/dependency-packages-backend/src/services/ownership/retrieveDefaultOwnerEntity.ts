@@ -9,7 +9,7 @@ export type RetrieveDefaultOwnerOptions = {
   baseConfig: BaseConfig;
 }
 
-export async function retrieverDefaultOwnerEntity(
+export async function retrieveDefaultOwnerEntity(
   options: RetrieveDefaultOwnerOptions,
 ): Promise<GroupEntity> {
   const { catalog, auth, baseConfig } = options;
