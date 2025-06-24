@@ -6,6 +6,7 @@ import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/
 import { catalogServiceRef } from "@backstage/plugin-catalog-node";
 import { DependencyPackagesProvider } from './provider/DependencyPackagesProvider';
 import { OwnershipProvider } from './provider/OwnershipProvider';
+import { readDependencyTypeConfig } from './config';
 
 export const catalogModuleDependencyPackages = createBackendModule({
   pluginId: 'catalog',
@@ -14,6 +15,7 @@ export const catalogModuleDependencyPackages = createBackendModule({
     reg.registerInit({
       deps: {
         auth: coreServices.auth,
+        config: coreServices.rootConfig,
         builder: catalogProcessingExtensionPoint,
         catalog: catalogServiceRef,
         discovery: coreServices.discovery,
@@ -27,7 +29,9 @@ export const catalogModuleDependencyPackages = createBackendModule({
         discovery,
         logger,
         scheduler,
+        config,
       }) {
+        const providerConfig = readDependencyTypeConfig(config);
         const backendUrl = await discovery.getBaseUrl('dependency-packages');
         // Create default owner if needed
         const ownershipProvider = new OwnershipProvider({
@@ -43,22 +47,19 @@ export const catalogModuleDependencyPackages = createBackendModule({
         });
         builder.addEntityProvider(ownershipProvider);
 
-        // Create dependency packages
-        const dependencyPackageProvider = new DependencyPackagesProvider({
-          env: 'local',
-          catalog,
-          auth,
-          backendUrl,
-          // TODO: This should be based on the individual provider
-          // probably pass the scheduler in and then build off
-          // it's config
-          taskRunner: scheduler.createScheduledTaskRunner({
-            frequency: { seconds: 10 },
-            timeout: { minutes: 1 },
-            initialDelay: { seconds: 15 }
-          }),
-        });
-        builder.addEntityProvider(dependencyPackageProvider);
+        if (providerConfig) {
+          Object.keys(providerConfig).forEach((provider) => {
+            // Create dependency packages
+            const dependencyPackageProvider = new DependencyPackagesProvider({
+              providerId: provider,
+              catalog,
+              auth,
+              backendUrl,
+              taskRunner: scheduler.createScheduledTaskRunner(providerConfig[provider]),
+            });
+            builder.addEntityProvider(dependencyPackageProvider);
+          });
+        };
       },
     });
   },

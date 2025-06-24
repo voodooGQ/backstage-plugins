@@ -9,7 +9,7 @@ import {
 import { ComponentEntity, GroupEntity } from '@backstage/catalog-model';
 
 export interface DependencyPackageProviderOptions {
-  env: string;
+  providerId: string;
   catalog: CatalogService;
   auth: AuthService;
   taskRunner: SchedulerServiceTaskRunner;
@@ -17,7 +17,7 @@ export interface DependencyPackageProviderOptions {
 }
 
 export class DependencyPackagesProvider {
-  private readonly env: string;
+  private readonly providerId: string;
   private readonly catalog: CatalogService;
   private readonly auth: AuthService;
   private readonly backendUrl: string;
@@ -25,7 +25,7 @@ export class DependencyPackagesProvider {
   private taskRunner: SchedulerServiceTaskRunner;
 
   constructor(options: DependencyPackageProviderOptions) {
-    this.env = options.env;
+    this.providerId = options.providerId;
     this.catalog = options.catalog;
     this.auth = options.auth;
     this.taskRunner = options.taskRunner;
@@ -33,7 +33,7 @@ export class DependencyPackagesProvider {
   }
 
   getProviderName(): string {
-    return `dependency-packages-${this.env}`;
+    return `dependency-package-provider-${this.providerId}`;
   }
 
   async connect(connection: EntityProviderConnection): Promise<void> {
@@ -175,7 +175,7 @@ export class DependencyPackagesProvider {
         type: 'full',
         entities: dependencyEntities.map((entity: ComponentEntity) => ({
           entity,
-          locationKey: `dependency-packages-provider:${this.env}`,
+          locationKey: `dependency-packages-provider:${this.providerId}`,
         })),
       });
     });

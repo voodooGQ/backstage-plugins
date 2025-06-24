@@ -84,10 +84,10 @@ dependencyPackages:
     description: "Dummy Group to list out Package Dependencies"
   providers:
     ruby:
-      cadence: '1h'
+      frequency: { hours: 1 }
       timeout: { minutes: 1 }
       initialDelay: { minutes: 1 }
     npm:
-      cadence: '1h'
+      frequency: { minutes: 1 }
       timeout: { minutes: 1 }
       initialDelay: { minutes: 1 }

@@ -1,43 +1,4 @@
-import { Config, readDurationFromConfig } from '@backstage/config';
-import {
-  DependencyType,
-  DependencyTypeRegistration,
-} from '@voodoogq/plugin-dependency-packages-node';
-import {
-  createDependencyTypeRegistration,
-  DependencyTypeRegistrationOptions,
-} from '../services';
-
-type DependencyTypeConfig = Omit<
-  DependencyTypeRegistrationOptions,
-  'dependencyType'
->;
-
-function readDependencyTypeConfig(
-  config: Config,
-  name: string,
-): DependencyTypeConfig | undefined {
-  const dependencyTypeConfig = config.getOptionalConfig(
-    `dependencyPackages.providers.${name}`,
-  );
-  if (!dependencyTypeConfig) {
-    return undefined;
-  }
-
-  const cadence = dependencyTypeConfig.getString('cadence');
-  const initialDelay = dependencyTypeConfig.has('initialDelay')
-    ? readDurationFromConfig(dependencyTypeConfig.getConfig('initialDelay'))
-    : undefined;
-  const timeout = dependencyTypeConfig.has('timeout')
-    ? readDurationFromConfig(dependencyTypeConfig.getConfig('timeout'))
-    : undefined;
-
-  return {
-    cadence,
-    initialDelay,
-    timeout,
-  };
-}
+import { Config } from '@backstage/config';
 
 export function readOwnerConfig(config: Config): string | undefined {
   return config.getOptionalString('dependencyPackages.owner');
@@ -100,19 +61,4 @@ export function createBaseConfig(config: Config): {
     lifecycleConfig,
     createOwnerConfig,
   };
-}
-
-export function createDependencyTypeRegistrationFromConfig(
-  config: Config,
-  name: string,
-  dependencyType: DependencyType,
-): DependencyTypeRegistration | undefined {
-  const dependencyTypeConfig = readDependencyTypeConfig(config, name);
-
-  return dependencyTypeConfig
-    ? createDependencyTypeRegistration({
-        ...dependencyTypeConfig,
-        dependencyType,
-      })
-    : undefined;
 }

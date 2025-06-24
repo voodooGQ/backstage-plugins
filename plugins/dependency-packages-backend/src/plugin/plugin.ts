@@ -4,29 +4,16 @@ import {
 } from '@backstage/backend-plugin-api';
 import { createRouter } from '../router';
 import {
-  dependencyPackagesDependencyTypeRegistryExtensionPoint,
   dependencyPackagesDependencyTypeExtensionPoint,
   DependencyType,
-  DependencyTypeRegistry,
-  DependencyTypeRegistration
 } from '@voodoogq/plugin-dependency-packages-node';
 import { catalogServiceRef } from "@backstage/plugin-catalog-node";
 import { dependencyPackagesPermissions } from '@voodoogq/plugin-dependency-packages-common';
-import { createDependencyTypeRegistrationFromConfig, createBaseConfig } from './config';
+import { createBaseConfig } from './config';
 
 export const dependencyPackagesPlugin = createBackendPlugin({
   pluginId: 'dependency-packages',
   register(env) {
-    let dependencyTypeRegistry: DependencyTypeRegistry | undefined = undefined;
-    env.registerExtensionPoint(
-      dependencyPackagesDependencyTypeRegistryExtensionPoint,
-      {
-        setDependencyTypeRegistry(registry: DependencyTypeRegistry): void {
-          dependencyTypeRegistry = registry;
-        },
-      },
-    );
-
     const addedDependencyTypes: Record<string, DependencyType> = {};
     env.registerExtensionPoint(dependencyPackagesDependencyTypeExtensionPoint, {
       addDependencyType(dependencyTypes: Record<string, DependencyType>): void {
@@ -63,31 +50,15 @@ export const dependencyPackagesPlugin = createBackendPlugin({
 
         const baseConfig = createBaseConfig(config);
 
-        const dependencyTypes: DependencyTypeRegistration[] = Object.entries(
-          addedDependencyTypes,
-        )
-          .map(([name, dependencyType]) => {
-            const registration = createDependencyTypeRegistrationFromConfig(
-              config,
-              name,
-              dependencyType,
-            )
-            return registration
-          })
-          .filter(registration => registration) as DependencyTypeRegistration[];
-
-        const context = { config };
-
         httpRouter.use(
           await createRouter({
-            ...context,
             httpAuth,
             logger,
             permissions,
-            dependencyTypes,
             baseConfig,
             auth,
             catalog,
+            dependencyTypes: Object.values(addedDependencyTypes),
           }),
         );
       },
