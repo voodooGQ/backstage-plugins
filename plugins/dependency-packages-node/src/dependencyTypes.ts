@@ -1,5 +1,3 @@
-import { HumanDuration } from '@backstage/types';
-import { Duration } from 'luxon';
 import express from 'express';
 
 export type DependencyType= {
@@ -10,17 +8,3 @@ export type DependencyType= {
   title?: string;
   description?: string;
 };
-
-export type DependencyTypeRegistration = {
-  dependencyType: DependencyType;
-  cadence?: string;
-  timeout?: Duration | HumanDuration;
-  initialDelay?: Duration | HumanDuration;
-};
-
-export interface DependencyTypeRegistry {
-  register(registration: DependencyTypeRegistration): Promise<void>;
-  get(retrieverReference: string): Promise<DependencyTypeRegistration>;
-  listDependencyTypes(): Promise<DependencyType[]>;
-  listRegistrations(): Promise<DependencyTypeRegistration[]>;
-}

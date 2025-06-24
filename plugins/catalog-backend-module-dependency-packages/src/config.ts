@@ -2,18 +2,13 @@ import { Config, readDurationFromConfig } from '@backstage/config';
 import { HumanDuration } from '@backstage/types';
 import { Duration } from 'luxon';
 
-export type DependencyTypeRegistrationOptions = {
+export type DependencyTypeConfig = {
   [key: string]: {
     frequency: Duration<boolean> | HumanDuration | { cron: string; } | { trigger: "manual"; }
     timeout: Duration<boolean> | HumanDuration;
     initialDelay: Duration<boolean> | HumanDuration;
   }
 };
-
-type DependencyTypeConfig = Omit<
-  DependencyTypeRegistrationOptions,
-  'dependencyType'
->;
 
 export function readDependencyTypeConfig(
   config: Config,
@@ -24,7 +19,7 @@ export function readDependencyTypeConfig(
     return undefined;
   }
 
-  const result: DependencyTypeRegistrationOptions = {};
+  const result: DependencyTypeConfig = {};
 
   const keys = providersConfig.keys();
 

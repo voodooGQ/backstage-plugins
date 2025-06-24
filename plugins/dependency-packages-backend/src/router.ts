@@ -7,7 +7,7 @@ import {
   PermissionsService
 } from '@backstage/backend-plugin-api';
 import { BaseConfig } from '@voodoogq/plugin-dependency-packages-common';
-import { retrieveDefaultOwnerEntity } from './services/retrieveDefaultOwnerEntity';
+import { retrieveDefaultOwnerEntity } from './plugin/retrieveDefaultOwnerEntity';
 import { AuthService } from '@backstage/backend-plugin-api';
 import { CatalogService } from '@backstage/plugin-catalog-node';
 
