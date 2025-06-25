@@ -6,13 +6,15 @@ export const parseGemfileLock = async (filePath: string): Promise<GemfileLockInf
   const lines = contents.split('\n');
 
   const specs: Record<string, string> = {};
-  const dependencies: string[] = [];
+  const dependencies: { name: string; requestedVersion: string }[] = [];
   const platforms: string[] = [];
   let bundledWith: string | null = null;
+  let rubyVersion: string | null = null;
 
   let inSpecs = false;
   let inDependencies = false;
   let inPlatforms = false;
+  let inRubyVersion = false;
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -21,28 +23,39 @@ export const parseGemfileLock = async (filePath: string): Promise<GemfileLockInf
       inSpecs = true;
       inDependencies = false;
       inPlatforms = false;
+      inRubyVersion = false;
       continue;
     }
     if (trimmed === 'DEPENDENCIES') {
       inSpecs = false;
       inDependencies = true;
       inPlatforms = false;
+      inRubyVersion = false;
       continue;
     }
     if (trimmed === 'PLATFORMS') {
       inSpecs = false;
       inDependencies = false;
       inPlatforms = true;
+      inRubyVersion = false;
       continue;
     }
     if (trimmed === 'BUNDLED WITH') {
       inSpecs = false;
       inDependencies = false;
       inPlatforms = false;
+      inRubyVersion = false;
+      continue;
+    }
+    if (trimmed === 'RUBY VERSION') {
+      inSpecs = false;
+      inDependencies = false;
+      inPlatforms = false;
+      inRubyVersion = true;
       continue;
     }
 
-    // Actual gem specs are 4 spaces indent, NOT 6 spaces
+    // Actual gem specs
     if (inSpecs && line.startsWith('    ') && !line.startsWith('      ')) {
       const match = trimmed.match(/^([a-zA-Z0-9_\-]+) \((.+?)\)/);
       if (match) {
@@ -50,24 +63,32 @@ export const parseGemfileLock = async (filePath: string): Promise<GemfileLockInf
       }
     }
 
+    // Dependency declaration
     if (inDependencies && line.startsWith('  ')) {
       const match = trimmed.match(/^([a-zA-Z0-9_\-]+)(?: \((.+?)\))?/);
       if (match) {
-        const gemName = match[1];
-        const requestedVersion = match[2] ?? '';
-        dependencies.push(`${gemName}|${requestedVersion}`);
+        dependencies.push({
+          name: match[1],
+          requestedVersion: match[2] ?? ''
+        });
       }
     }
 
+    // Platforms
     if (inPlatforms && line.startsWith('  ')) {
       platforms.push(trimmed);
     }
 
-    if (!inSpecs && !inDependencies && !inPlatforms && /^[ ]{3,}/.test(line) && /^\d/.test(trimmed)) {
-      // This captures the version line after "BUNDLED WITH"
+    // Bundled with
+    if (!inSpecs && !inDependencies && !inPlatforms && !inRubyVersion && /^[ ]{3,}/.test(line) && /^\d/.test(trimmed)) {
       bundledWith = trimmed;
+    }
+
+    // Ruby version
+    if (inRubyVersion && line.startsWith('  ')) {
+      rubyVersion = trimmed;
     }
   }
 
-  return { specs, dependencies, platforms, bundledWith };
-}
+  return { specs, dependencies, platforms, bundledWith, rubyVersion };
+};

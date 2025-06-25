@@ -9,6 +9,7 @@ export class DependencyReferenceParser {
 
   public parse(dependencyReferences: DependencyReference[]): Promise<ParsedDependencies> {
     dependencyReferences.forEach(dependencyReference => {
+      // TOOD: This needs to account for devDependencies, peerDependencies, and optionalDependencies
       dependencyReference.dependencies.forEach(dependency => {
         const [name, version] = dependency;
 

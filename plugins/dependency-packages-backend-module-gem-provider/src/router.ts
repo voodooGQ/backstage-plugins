@@ -6,6 +6,7 @@ import { InputError } from '@backstage/errors';
 import { ComponentEntity } from "@backstage/catalog-model";
 import { PACKAGE_DEPS_GEM_ANNOTATION } from "./constants";
 import { GemfileLockRetriever } from './retriever/GemfileLockRetriever';
+import { DependencyReferenceParser } from './parser';
 
 export interface RouterOptions {
   logger: LoggerService;
@@ -41,6 +42,9 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
 
     const retriever = new GemfileLockRetriever({ logger });
     const deps = await retriever.retrieve(parsed.data.entities as unknown as ComponentEntity[]);
+    const paraser = new DependencyReferenceParser();
+    const parsedDeps = await paraser.parse(deps);
+    console.log(JSON.stringify(parsedDeps, null, 2));
     // TODO: Add more here
     res.status(201).json({ message: 'success', data: [] });
   });

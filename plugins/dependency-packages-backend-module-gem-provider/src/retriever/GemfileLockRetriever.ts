@@ -17,48 +17,54 @@ export class GemfileLockRetriever implements DependencyTypeRetriever {
   }
 
   public async retrieve(entities: ComponentEntity[]): Promise<GemDependencyReference[]> {
-    return await Promise.all(entities.map(async (entity: ComponentEntity) => {
-      const gemfileLocation = entity.metadata.annotations?.[PACKAGE_DEPS_GEM_ANNOTATION];
+    return await Promise.all(
+      entities.map(async (entity: ComponentEntity) => {
+        const gemfileLocation = entity.metadata.annotations?.[PACKAGE_DEPS_GEM_ANNOTATION];
 
-      if (!gemfileLocation) {
-        this.logger.error(`Missing Gemfile.lock location for entity: ${entity.metadata.name}`);
-        throw new Error('Missing location');
-      }
+        if (!gemfileLocation) {
+          this.logger.error(`Missing Gemfile.lock location for entity: ${entity.metadata.name}`);
+          throw new Error('Missing location');
+        }
 
-      const entityRef = stringifyEntityRef(entity);
+        const entityRef = stringifyEntityRef(entity);
 
-      if (gemfileLocation.startsWith('file:')) {
-        const gemfileLockLocation = gemfileLocation + '.lock';
-        const [{ specs, dependencies, platforms, bundledWith }, gemGroups] = await Promise.all([
-          parseGemfileLock(gemfileLockLocation),
-          parseGemfile(gemfileLocation),
-        ]);
+        if (gemfileLocation.startsWith('file:')) {
+          const gemfileLockLocation = gemfileLocation + '.lock';
+          const [{ specs, dependencies, platforms, bundledWith, rubyVersion }, gemGroups] = await Promise.all([
+            parseGemfileLock(gemfileLockLocation),
+            parseGemfile(gemfileLocation),
+          ]);
 
-        const gems = dependencies.map(d => {
-          const [gem, requestedVersion = ''] = d.split('|');
+          const gems = Object.keys(specs).map(gem => {
+            const specVersion = specs[gem];
+            const dep = dependencies.find(d => d.name === gem);
+            return {
+              gem,
+              version: specVersion,
+              requestedVersion: dep?.requestedVersion ?? null,
+              profiles: gemGroups[gem] ?? [],
+              transient: !dep,
+            };
+          });
+
           return {
-            gem,
-            version: specs[gem] ?? 'UNKNOWN',
-            requestedVersion,
-            profiles: gemGroups[gem] ?? []
+            entityRef,
+            gems,
+            platforms,
+            bundledWith,
+            rubyVersion: rubyVersion ?? null,
           };
-        });
+        }
 
+        // TODO: Add SCM support
         return {
           entityRef,
-          gems,
-          platforms,
-          bundledWith
+          gems: [],
+          platforms: [],
+          bundledWith: null,
+          rubyVersion: null,
         };
-      }
-
-      // TODO: Add SCM support
-      return {
-        entityRef,
-        gems: [],
-        platforms: [],
-        bundledWith: ''
-      };
-    }));
+      })
+    );
   }
 }

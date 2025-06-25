@@ -5,7 +5,7 @@ export const parseGemfile = async (filePath: string): Promise<Record<GemHandle, 
   const contents = await fs.readFile(filePath.replace('file:', ''), 'utf-8');
   const lines = contents.split('\n');
 
-  const gemGroups: Record<string, string[]> = {};
+  const gemGroups: Record<GemHandle, VersionHandle[]> = {};
   let currentGroups: string[] = [];
 
   for (const line of lines) {
@@ -27,4 +27,4 @@ export const parseGemfile = async (filePath: string): Promise<Record<GemHandle, 
   }
 
   return gemGroups;
-}
+};
