@@ -18,7 +18,7 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
   router.use(express.json());
 
   router.post('/retrieve', async (req, res) => {
-    // Make sure we have a Component Entity with the write annotations
+    // Make sure we have a Component Entity with the right annotations
     const schema = z.object({
       entities: z.array(
         z.object({
@@ -42,7 +42,6 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
       throw new InputError(parsed.error.toString());
     }
 
-    logger.info('Retrieving NPM Entities');
     const retriever = new PackageJsonRetriever({ logger });
     const deps = await retriever.retrieve(parsed.data.entities as unknown as ComponentEntity[]);
     const parser = new DependencyReferenceParser();

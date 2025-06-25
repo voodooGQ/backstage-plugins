@@ -83,11 +83,11 @@ dependencyPackages:
     name: 'package-dummy'
     description: "Dummy Group to list out Package Dependencies"
   providers:
-    ruby:
-      frequency: { hours: 1 }
+    gem:
+      frequency: { seconds: 20 }
       timeout: { minutes: 1 }
-      initialDelay: { minutes: 1 }
+      initialDelay: { seconds: 15 }
     npm:
-      frequency: { minutes: 1 }
+      frequency: { seconds: 20 }
       timeout: { minutes: 1 }
-      initialDelay: { minutes: 1 }
+      initialDelay: { seconds: 15 }

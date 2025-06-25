@@ -14,7 +14,7 @@ export class DependencyEntityBuilder {
       packageVersionReferences: [],
     },
     spec: {
-      type: 'packageDependency',
+      type: 'dependency-package',
       dependencyOf: []
     },
   };

@@ -39,8 +39,11 @@ export const catalogModuleDependencyPackages = createBackendModule({
           catalog,
           logger,
           backendUrl,
+          // TODO: Probably should handle this differently instead of a task
+          // should just be created once the catalog is available and
+          // only need update if something changes in the config.
           taskRunner: scheduler.createScheduledTaskRunner({
-            frequency: { seconds: 10 },
+            frequency: { days: 1 },
             timeout: { minutes: 1 },
             initialDelay: { seconds: 10 }
           }),
@@ -54,6 +57,7 @@ export const catalogModuleDependencyPackages = createBackendModule({
               providerId: provider,
               catalog,
               auth,
+              logger,
               backendUrl,
               taskRunner: scheduler.createScheduledTaskRunner(providerConfig[provider]),
             });
