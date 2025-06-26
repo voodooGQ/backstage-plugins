@@ -76,12 +76,12 @@ permission:
 
 dependencyPackages:
   # TODO: Probably should define owner type as well (e.g. User/Group)
-  # owner: 'acme-corp'
+  owner: 'acme-corp'
   lifecycle: 'external'
-  createOwner:
-    enabled: true
-    name: 'package-dummy'
-    description: "Dummy Group to list out Package Dependencies"
+  # createOwner:
+  #   enabled: true
+  #   name: 'package-dummy'
+  #   description: "Dummy Group to list out Package Dependencies"
   providers:
     gem:
       frequency: { seconds: 20 }

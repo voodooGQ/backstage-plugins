@@ -1,11 +1,11 @@
 import { ComponentEntity, ANNOTATION_LOCATION, ANNOTATION_ORIGIN_LOCATION, ANNOTATION_SOURCE_LOCATION, GroupEntity } from "@backstage/catalog-model";
-import { ParsedDependencies } from "@voodoogq/plugin-dependency-packages-common";
 import { RegistryMetaRetriever } from "../retriever/RegistryMetaRetriever";
-import { NpmRegistryResponse } from "../types/RubyGemsRegistry";
 import { DependencyEntityBuilder } from "@voodoogq/plugin-dependency-packages-node";
+import { ParsedDependencies } from "../types";
+import { RubyGem } from "../types/RubyGemsRegistry";
 
-export class NpmComponentEntityBuilder extends DependencyEntityBuilder {
-  public readonly dependencyTypeId: string = 'npm';
+export class GemComponentEntityBuilder extends DependencyEntityBuilder {
+  public readonly dependencyTypeId: string = 'gem';
 
   protected builtEntities: ComponentEntity[] = [];
 
@@ -17,54 +17,24 @@ export class NpmComponentEntityBuilder extends DependencyEntityBuilder {
     this.registryMetaRetriever = new RegistryMetaRetriever();
   }
 
-  private npmRegistryUrl(name: string): string {
-    return `https://www.npmjs.com/package/${name}`;
-  }
+  private compileLinks(meta: RubyGem): { url: string, title: string }[] {
+    const links = [
+      { uri: 'project_uri', title: "Project" },
+      { uri: 'gem_uri', title: "Gem" },
+      { uri: 'homepage_uri', title: "Homepage" },
+      { uri: 'wiki_uri', title: "Wiki" },
+      { uri: 'documentation_uri', title: "Documentation" },
+      { uri: 'mailing_list_uri', title: "Mailing List" },
+      { uri: 'source_code_uri', title: "Source" },
+      { uri: 'bug_tracker_uri', title: "Bug Tracker" },
+    ].map((val) => {
+      if (!meta[val.uri]) { return }
 
-  private sourceLocationParser(sourceLocation: NpmRegistryResponse['repository']): string {
-    if (typeof sourceLocation === 'string') {
-      return this.gitToHttpUrl(sourceLocation);
-    }
-
-    // TODO: Not sure if this will be right since it'll have `.git` at the end, verify
-    if (sourceLocation.directory) {
-      return this.gitToHttpUrl(`${sourceLocation.url}`, sourceLocation.directory);
-    }
-
-    return this.gitToHttpUrl(sourceLocation.url);
-  }
-
-  private compileLinks(meta: NpmRegistryResponse): { url: string, title: string }[] {
-    const links: { url: string, title: string }[] = [
-      { url: this.npmRegistryUrl(meta.name), title: 'NPM' }
-    ];
-
-    if (meta.repository) {
-      links.push({ url: this.sourceLocationParser(meta.repository), title: 'Source' });
-    }
-
-    if (meta.bugs) {
-      if (typeof meta.bugs === 'string') {
-        links.push({ url: meta.bugs, title: 'Bugs' });
-      } else {
-        if (meta.bugs.url) {
-          links.push({ url: meta.bugs.url, title: 'Bugs' });
-        }
-
-        if (meta.bugs.email) {
-          links.push({ url: `mailto:${meta.bugs.email}`, title: 'Bugs' });
-        }
+      return {
+        url: meta[val.uri] as string,
+        title: val.title as string,
       }
-    }
-
-    if (meta.homepage) {
-      links.push({ url: meta.homepage, title: 'Homepage' });
-    }
-
-    if (meta.readmeFilename) {
-      links.push({ url: this.gitToHttpUrl(this.sourceLocationParser(meta.repository), meta.readmeFilename), title: 'Readme' });
-    }
-
+    }).filter((v) => v !== undefined)
     return links;
   }
 
@@ -74,36 +44,37 @@ export class NpmComponentEntityBuilder extends DependencyEntityBuilder {
     lifecycle?: string;
   }): Promise<ComponentEntity[]> {
     const { parsedDependencies, owner, lifecycle } = options;
-    const keys = Object.keys(parsedDependencies);
 
-    await Promise.all(keys.map(async key => {
-      const meta = await this.registryMetaRetriever.retrieve(key);
-      const entityRefs = parsedDependencies[key].versionReferences.map(versionReference => versionReference.entityRef);
-      const entity = {
-        ...this.template,
-        metadata: {
-          ...this.template.metadata,
-          name: this.nameMutation(key),
-          description: meta.description,
-          title: `dep:npm:${key}`,
-          packageVersionReferences: parsedDependencies[key].versionReferences,
-          links: this.compileLinks(meta),
-          annotations: {
-            ...this.template.metadata?.annotations,
-            [ANNOTATION_LOCATION]: `url:${this.npmRegistryUrl(key)}`,
-            [ANNOTATION_ORIGIN_LOCATION]: `url:${this.npmRegistryUrl(key)}`,
-            [ANNOTATION_SOURCE_LOCATION]: this.sourceLocationParser(meta.repository),
+    await Promise.all(
+      Object.keys(parsedDependencies).map(async key => {
+        const meta = await this.registryMetaRetriever.retrieve(key);
+        const entityReferences = Object.keys(parsedDependencies[key].entityReferences);
+        const entity = {
+          ...this.template,
+          metadata: {
+            ...this.template.metadata,
+            name: this.nameMutation(key),
+            description: meta.info,
+            title: `dep:gem:${key}`,
+            packageVersionReferences: parsedDependencies[key].entityReferences,
+            links: this.compileLinks(meta),
+            annotations: {
+              ...this.template.metadata?.annotations,
+              [ANNOTATION_LOCATION]: `url:${meta.gem_uri}`,
+              [ANNOTATION_ORIGIN_LOCATION]: `url:${meta.gem_uri}`,
+              [ANNOTATION_SOURCE_LOCATION]: `url:${meta.source_code_uri}`
+            }
+          },
+          spec: {
+            ...this.template.spec,
+            owner: owner.metadata.name,
+            lifecycle: lifecycle || "experimnetal",
+            dependencyOf: entityReferences,
           }
-        },
-        spec: {
-          ...this.template.spec,
-          owner: owner.metadata.name,
-          lifecycle: lifecycle || 'experimental',
-          dependencyOf: entityRefs
-        }
-      } as ComponentEntity;
-      this.builtEntities.push(entity);
-    }));
+        } as ComponentEntity;
+        this.builtEntities.push(entity);
+      })
+    )
 
     return this.builtEntities;
   }

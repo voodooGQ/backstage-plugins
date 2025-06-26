@@ -3,10 +3,11 @@ import Router from 'express-promise-router';
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { z } from 'zod';
 import { InputError } from '@backstage/errors';
-import { ComponentEntity } from "@backstage/catalog-model";
+import { ComponentEntity, GroupEntity } from "@backstage/catalog-model";
 import { PACKAGE_DEPS_GEM_ANNOTATION } from "./constants";
 import { GemfileLockRetriever } from './retriever/GemfileLockRetriever';
 import { DependencyReferenceParser } from './parser';
+import { GemComponentEntityBuilder } from './builder/GemComponentEntityBuilder';
 
 export interface RouterOptions {
   logger: LoggerService;
@@ -44,9 +45,13 @@ export async function createRouter({ logger }: RouterOptions): Promise<express.R
     const deps = await retriever.retrieve(parsed.data.entities as unknown as ComponentEntity[]);
     const paraser = new DependencyReferenceParser();
     const parsedDeps = await paraser.parse(deps);
-    console.log(JSON.stringify(parsedDeps, null, 2));
-    // TODO: Add more here
-    res.status(201).json({ message: 'success', data: [] });
+    const builder = new GemComponentEntityBuilder();
+    const entities = await builder.build({
+      parsedDependencies: parsedDeps,
+      owner: parsed.data.owner as unknown as GroupEntity,
+      lifecycle: parsed.data.lifecycle,
+    })
+    res.status(201).json({ message: 'success', data: entities });
   });
 
   return router;

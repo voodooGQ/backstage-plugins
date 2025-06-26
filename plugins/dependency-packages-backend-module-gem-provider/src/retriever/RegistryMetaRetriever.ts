@@ -1,9 +1,9 @@
-import { NpmRegistryResponse } from "../types/RubyGemsRegistry";
+import { RubyGem } from "../types/RubyGemsRegistry";
 
 export class RegistryMetaRetriever {
-  public async retrieve(packageName: string): Promise<NpmRegistryResponse> {
+  public async retrieve(gemName: string): Promise<RubyGem> {
     const registryResponse = await fetch(
-      `https://registry.npmjs.org/${packageName}`, {
+      `https://rubygems.org/api/v1/gems/${gemName}.json`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

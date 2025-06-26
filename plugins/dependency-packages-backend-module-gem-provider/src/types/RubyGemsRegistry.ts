@@ -1,13 +1,3 @@
-// TODO: See if this is right
-export interface RubyGemsRegistryResponse {
-  name: string;
-  'dist-tags': Record<string, string>;
-  versions: Record<string, RubyGem>;
-  time?: Record<string, string>;
-  modified?: string;
-  [key: string]: unknown; // future changes
-}
-
 export interface RubyGemDependency {
   name: string;
   requirements: string;

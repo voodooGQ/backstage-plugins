@@ -62,7 +62,7 @@ export class DependencyEntityBuilder {
   }
 
   public async build(_options: {
-    parsedDependencies: ParsedDependencies,
+    parsedDependencies: unknown,
     owner: GroupEntity,
     lifecycle?: string,
   }): Promise<ComponentEntity[]> {
