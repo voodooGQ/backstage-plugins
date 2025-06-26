@@ -52,4 +52,9 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 // kubernetes
 backend.add(import('@backstage/plugin-kubernetes-backend'));
 
+// dependency-packages
+backend.add(import('@voodoogq/plugin-dependency-packages-backend'));
+backend.add(import('@voodoogq/plugin-dependency-packages-backend-module-npm-provider'));
+backend.add(import('@voodoogq/plugin-dependency-packages-backend-module-gem-provider'));
+backend.add(import('@voodoogq/plugin-catalog-backend-module-dependency-packages'));
 backend.start();

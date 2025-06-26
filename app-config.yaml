@@ -20,7 +20,9 @@ backend:
     credentials: true
   database:
     client: better-sqlite3
-    connection: ':memory:'
+    connection:
+      directory: "./db"
+    useNullAsDefault: true
   workingDirectory: /tmp
 
 integrations:
@@ -40,6 +42,7 @@ auth:
     guest: {}
 
 catalog:
+  orphanStrategy: delete
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
@@ -56,6 +59,10 @@ catalog:
       target: ../../examples/org.yaml
       rules:
         - allow: [User, Group]
+    - type: file
+      target: ../../examples/repos/npm/catalog-info.yaml
+    - type: file
+      target: ../../examples/repos/ruby/catalog-info.yaml
     - type: url
       target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
     - type: url
@@ -66,3 +73,21 @@ catalog:
 
 permission:
   enabled: true
+
+dependencyPackages:
+  # TODO: Probably should define owner type as well (e.g. User/Group)
+  owner: 'acme-corp'
+  lifecycle: 'external'
+  # createOwner:
+  #   enabled: true
+  #   name: 'package-dummy'
+  #   description: "Dummy Group to list out Package Dependencies"
+  providers:
+    gem:
+      frequency: { seconds: 20 }
+      timeout: { minutes: 1 }
+      initialDelay: { seconds: 15 }
+    npm:
+      frequency: { seconds: 20 }
+      timeout: { minutes: 1 }
+      initialDelay: { seconds: 15 }

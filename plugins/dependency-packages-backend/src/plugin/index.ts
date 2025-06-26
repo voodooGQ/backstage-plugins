@@ -1,0 +1,1 @@
+export { dependencyPackagesPlugin } from './plugin';

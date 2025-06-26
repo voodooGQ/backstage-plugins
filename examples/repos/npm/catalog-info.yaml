@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: npm-app
+  description: An example of an npm application.
+  annotations:
+    package-deps/npm: "file:/Users/sas/Code/github.com/voodooGQ/backstage-plugins/examples/repos/npm/package.json"
+spec:
+  type: app
+  owner: guests
+  lifecycle: experimental
