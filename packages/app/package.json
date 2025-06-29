@@ -39,7 +39,7 @@
     "@backstage/plugin-techdocs-react": "^1.2.17",
     "@backstage/plugin-user-settings": "^0.8.22",
     "@backstage/theme": "^0.6.6",
-    "@internal/plugin-dependency-packages-npm": "workspace:^",
+    "@voodoogq/plugin-dependency-packages-npm": "workspace:^",
     "@material-ui/core": "^4.12.2",
     "@material-ui/icons": "^4.9.1",
     "react": "^18.0.2",
