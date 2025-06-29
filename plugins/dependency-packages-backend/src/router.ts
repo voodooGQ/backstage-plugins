@@ -1,5 +1,7 @@
 import express from 'express';
 import Router from 'express-promise-router';
+import { z } from 'zod';
+import { InputError } from '@backstage/errors';
 import { DependencyType } from '@voodoogq/plugin-dependency-packages-node';
 import {
   HttpAuthService,
@@ -56,6 +58,61 @@ export async function createRouter({
   router.get('/dependency-types', async (_req, res) => {
     res.status(201).json({ message: 'success', data: dependencyTypes });
   });
+
+  router.get('/source-entities', async (req, res) => {
+    const types = [...dependencyTypes.map((type) => type.id)] as const;
+    const schema = z.object({
+      type: z.enum([types[0], ...types]),
+    })
+
+    const parsed = schema.safeParse(req.body);
+
+    if (!parsed.success) {
+      throw new InputError(parsed.error.toString());
+    }
+
+    const credentials = await auth.getOwnServiceCredentials();
+    // TODO: Probably just get the ref and send that
+    const entities = catalog.getEntities({
+      filter: [
+        { kind: 'Component' }
+      ]
+    }, { credentials })
+
+    const filtered = (await entities).items.filter(entity => {
+      return entity.metadata.annotations?.[`package-deps/${parsed.data?.type}`]
+    })
+
+    res.status(201).json({ message: 'success', data: filtered })
+  })
+
+  router.get('/dependencies', async(req, res) => {
+    const types = [...dependencyTypes.map((type) => type.id)] as const;
+    const schema = z.object({
+      entityRef: z.string(),
+      type: z.enum([types[0], ...types]),
+    })
+
+    const parsed = schema.safeParse(req.body);
+
+    if (!parsed.success) {
+      throw new InputError(parsed.error.toString());
+    }
+
+    const dependencyType = parsed.data.type;
+    const entityRef = parsed.data.entityRef;
+    const credentials = await auth.getOwnServiceCredentials();
+    const sourceEntity = await catalog.getEntityByRef(entityRef, { credentials })
+
+    if (!sourceEntity) {
+      res.status(400).json({ message: `Source Entity ${entityRef} not found`})
+    }
+
+    const relations = sourceEntity!.relations;
+    const dependencyTypeRefs = relations?.filter(relation => relation.targetRef.startsWith(`component:default/dep.${dependencyType}`))
+
+    res.status(201).json({ message: 'success', data: dependencyTypeRefs})
+  })
 
   /**
    * Extend the module routers
